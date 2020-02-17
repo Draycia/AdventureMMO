@@ -17,24 +17,24 @@ import me.mrdaniel.adventuremmo.AdventureMMO;
 
 public class CommandItemClear extends PlayerCommand {
 
-	private final AdventureMMO mmo;
+    private final AdventureMMO mmo;
 
-	public CommandItemClear(@Nonnull final AdventureMMO mmo) {
-		this.mmo = mmo;
-	}
+    public CommandItemClear(@Nonnull final AdventureMMO mmo) {
+        this.mmo = mmo;
+    }
 
-	@Override
-	public void execute(final Player p, final CommandContext args) {
-		Optional<ItemStack> hand = p.getItemInHand(HandTypes.MAIN_HAND);
+    @Override
+    public void execute(final Player p, final CommandContext args) {
+        Optional<ItemStack> hand = p.getItemInHand(HandTypes.MAIN_HAND);
 
-		if (!hand.isPresent()) {
-			p.sendMessage(Text.of(TextColors.RED, "You must be holding an item to use this command"));
-			return;
-		}
+        if (!hand.isPresent()) {
+            p.sendMessage(Text.of(TextColors.RED, "You must be holding an item to use this command"));
+            return;
+        }
 
-		ItemType item = hand.get().getType();
+        ItemType item = hand.get().getType();
 
-		this.mmo.getItemDatabase().remove(item);
-		this.mmo.getMessages().sendItemClear(p, item);
-	}
+        this.mmo.getItemDatabase().remove(item);
+        this.mmo.getMessages().sendItemClear(p, item);
+    }
 }

@@ -9,13 +9,13 @@ import org.spongepowered.api.registry.CatalogRegistryModule;
 
 public class AbilityRegistryModule implements CatalogRegistryModule<Ability> {
 
-	@Override
-	public Optional<Ability> getById(@Nonnull final String id) {
-		return Abilities.of(id);
-	}
+    @Override
+    public Optional<Ability> getById(@Nonnull final String id) {
+        return Abilities.of(id);
+    }
 
-	@Override
-	public Collection<Ability> getAll() {
-		return Abilities.VALUES;
-	}
+    @Override
+    public Collection<Ability> getAll() {
+        return Abilities.VALUES;
+    }
 }

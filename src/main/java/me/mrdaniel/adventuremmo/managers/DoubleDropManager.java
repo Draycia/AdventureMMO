@@ -25,46 +25,46 @@ import me.mrdaniel.adventuremmo.AdventureMMO;
 
 public class DoubleDropManager {
 
-	private final Map<World, Map<Vector3i, Integer>> blocks;
+    private final Map<World, Map<Vector3i, Integer>> blocks;
 
-	public DoubleDropManager(@Nonnull final AdventureMMO mmo) {
-		this.blocks = Maps.newHashMap();
+    public DoubleDropManager(@Nonnull final AdventureMMO mmo) {
+        this.blocks = Maps.newHashMap();
 
-		Task.builder().delayTicks(10).intervalTicks(1).execute(() -> this.blocks.values().forEach(Map::clear))
-				.submit(mmo);
-		mmo.getGame().getServer().getWorlds().forEach(w -> this.blocks.put(w, Maps.newHashMap()));
-	}
+        Task.builder().delayTicks(10).intervalTicks(1).execute(() -> this.blocks.values().forEach(Map::clear))
+                .submit(mmo);
+        mmo.getGame().getServer().getWorlds().forEach(w -> this.blocks.put(w, Maps.newHashMap()));
+    }
 
-	public void addDouble(@Nonnull final World world, @Nonnull final Vector3i pos) {
-		this.blocks.get(world).put(pos, 2);
-	}
+    public void addDouble(@Nonnull final World world, @Nonnull final Vector3i pos) {
+        this.blocks.get(world).put(pos, 2);
+    }
 
-	public void addTriple(@Nonnull final World world, @Nonnull final Vector3i pos) {
-		this.blocks.get(world).put(pos, 3);
-	}
+    public void addTriple(@Nonnull final World world, @Nonnull final Vector3i pos) {
+        this.blocks.get(world).put(pos, 3);
+    }
 
-	@Listener
-	@IsCancelled(value = Tristate.FALSE)
-	public void onWorldLoad(final LoadWorldEvent e) {
-		this.blocks.put(e.getTargetWorld(), Maps.newHashMap());
-	}
+    @Listener
+    @IsCancelled(value = Tristate.FALSE)
+    public void onWorldLoad(final LoadWorldEvent e) {
+        this.blocks.put(e.getTargetWorld(), Maps.newHashMap());
+    }
 
-	@Listener
-	@IsCancelled(value = Tristate.FALSE)
-	public void onWorldUnload(final UnloadWorldEvent e) {
-		this.blocks.remove(e.getTargetWorld());
-	}
+    @Listener
+    @IsCancelled(value = Tristate.FALSE)
+    public void onWorldUnload(final UnloadWorldEvent e) {
+        this.blocks.remove(e.getTargetWorld());
+    }
 
-	@Listener(order = Order.LATE)
-	@IsCancelled(value = Tristate.FALSE)
-	public void onItemDrop(final DropItemEvent.Destruct e) {
-		e.getEntities().stream().filter(ent -> ent instanceof Item).map(ent -> (Item) ent).forEach(item -> {
-			Optional.ofNullable(this.blocks.get(item.getWorld()).get(item.getLocation().getBlockPosition()))
-					.ifPresent(times -> {
-						ItemStack is = item.item().get().createStack();
-						is.setQuantity(is.getQuantity() * times);
-						item.offer(Keys.REPRESENTED_ITEM, is.createSnapshot());
-					});
-		});
-	}
+    @Listener(order = Order.LATE)
+    @IsCancelled(value = Tristate.FALSE)
+    public void onItemDrop(final DropItemEvent.Destruct e) {
+        e.getEntities().stream().filter(ent -> ent instanceof Item).map(ent -> (Item) ent).forEach(item -> {
+            Optional.ofNullable(this.blocks.get(item.getWorld()).get(item.getLocation().getBlockPosition()))
+                    .ifPresent(times -> {
+                        ItemStack is = item.item().get().createStack();
+                        is.setQuantity(is.getQuantity() * times);
+                        item.offer(Keys.REPRESENTED_ITEM, is.createSnapshot());
+                    });
+        });
+    }
 }

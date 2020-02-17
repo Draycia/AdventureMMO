@@ -75,234 +75,240 @@ import me.mrdaniel.adventuremmo.utils.ChoiceMaps;
 import me.mrdaniel.adventuremmo.utils.ItemUtils;
 
 @Plugin(id = "adventuremmo", name = "AdventureMMO", version = "2.1.2", description = "A light-weight plugin that adds skills with all sorts of fun game mechanics to your server.", authors = {
-		"Daniel12321", "rojo8399" })
+        "Daniel12321", "rojo8399" })
 public class AdventureMMO {
 
-	private final Game game;
-	private final Logger logger;
-	private final Path configdir;
-	private final PluginContainer container;
+    private final Game game;
+    private final Logger logger;
+    private final Path configdir;
+    private final PluginContainer container;
 
-	private PlayerDatabase playerdata;
-	private TopDatabase tops;
-	private ItemDatabase itemdata;
-	private MenuManager menus;
-	private MessageManager messages;
-	private DoubleDropManager doubledrops;
-	private ChoiceMaps choices;
+    private PlayerDatabase playerdata;
+    private TopDatabase tops;
+    private ItemDatabase itemdata;
+    private MenuManager menus;
+    private MessageManager messages;
+    private DoubleDropManager doubledrops;
+    private ChoiceMaps choices;
 
-	@Inject
-	public AdventureMMO(final Game game, @ConfigDir(sharedRoot = false) final Path path,
-			final PluginContainer container, Logger logger, final MetricsLite metrics) {
-		this.game = game;
-		this.logger = logger;
-		this.configdir = path;
-		this.container = container;
+    @Inject
+    public AdventureMMO(final Game game, @ConfigDir(sharedRoot = false) final Path path,
+            final PluginContainer container, Logger logger, final MetricsLite metrics) {
+        this.game = game;
+        this.logger = logger;
+        this.configdir = path;
+        this.container = container;
 
-		if (!Files.exists(path)) {
-			try {
-				Files.createDirectory(path);
-			} catch (final IOException exc) {
-				this.logger.error("Failed to create main config directory: {}", exc);
-			}
-		}
-	}
+        if (!Files.exists(path)) {
+            try {
+                Files.createDirectory(path);
+            } catch (final IOException exc) {
+                this.logger.error("Failed to create main config directory: {}", exc);
+            }
+        }
+    }
 
-	@Listener
-	public void onPreInit(@Nullable final GamePreInitializationEvent e) {
-		this.logger.info("Registering custom data...");
+    @Listener
+    public void onPreInit(@Nullable final GamePreInitializationEvent e) {
+        this.logger.info("Registering custom data...");
 
-		// Initialize the MMOKeys class and register the keys.
-		@SuppressWarnings("unused")
-		Object key = MMOKeys.DURABILITY;
+        // Initialize the MMOKeys class and register the keys.
+        @SuppressWarnings("unused")
+        Object key = MMOKeys.DURABILITY;
 
-		// Register Modules
-		this.game.getRegistry().registerModule(SkillType.class, new SkillTypeRegistryModule());
-		this.game.getRegistry().registerModule(ToolType.class, new ToolTypeRegistryModule());
-		this.game.getRegistry().registerModule(Ability.class, new AbilityRegistryModule());
-		this.game.getRegistry().registerModule(Setting.class, new SettingRegistryModule());
+        // Register Modules
+        this.game.getRegistry().registerModule(SkillType.class, new SkillTypeRegistryModule());
+        this.game.getRegistry().registerModule(ToolType.class, new ToolTypeRegistryModule());
+        this.game.getRegistry().registerModule(Ability.class, new AbilityRegistryModule());
+        this.game.getRegistry().registerModule(Setting.class, new SettingRegistryModule());
 
-		// Regsiter Service
-		this.game.getServiceManager().setProvider(this, AdventureMMOService.class, new AdventureMMOService(this));
+        // Regsiter Service
+        this.game.getServiceManager().setProvider(this, AdventureMMOService.class, new AdventureMMOService(this));
 
-		this.logger.info("Registered custom data successfully.");
-	}
+        this.logger.info("Registered custom data successfully.");
+    }
 
-	@Listener
-	public void onInit(@Nullable final GameInitializationEvent e) {
-		this.logger.info("Loading plugin...");
+    @Listener
+    public void onInit(@Nullable final GameInitializationEvent e) {
+        this.logger.info("Loading plugin...");
 
-		// Register Data
-		DataRegistration.builder().dataClass(MMOData.class).immutableClass(ImmutableMMOData.class)
-				.builder(new MMODataBuilder()).manipulatorId("data").dataName("Data").buildAndRegister(container);
-		DataRegistration.builder().dataClass(SuperToolData.class).immutableClass(ImmutableSuperToolData.class)
-				.builder(new SuperToolDataBuilder()).manipulatorId("super-tool-data").dataName("Super Tool Data")
-				.buildAndRegister(container);
+        // Register Data
+        DataRegistration.builder().dataClass(MMOData.class).immutableClass(ImmutableMMOData.class)
+                .builder(new MMODataBuilder()).manipulatorId("data").dataName("Data").buildAndRegister(container);
+        DataRegistration.builder().dataClass(SuperToolData.class).immutableClass(ImmutableSuperToolData.class)
+                .builder(new SuperToolDataBuilder()).manipulatorId("super-tool-data").dataName("Super Tool Data")
+                .buildAndRegister(container);
 
-		final long startuptime = System.currentTimeMillis();
+        final long startuptime = System.currentTimeMillis();
 
-		// Loading Config
-		final Config config = new Config(this, this.configdir.resolve("config.conf"));
+        // Loading Config
+        final Config config = new Config(this, this.configdir.resolve("config.conf"));
 
-		// Registering Config Settings
-		Abilities.VALUES.removeIf(ability -> !config.getNode("abilities", ability.getId(), "enabled").getBoolean(true));
-		Abilities.VALUES.forEach(ability -> ability.setValues(config.getNode("abilities", ability.getId())));
-		SkillTypes.VALUES.removeIf(skill -> !config.getNode("skills", skill.getId(), "enabled").getBoolean(true));
-		SkillTypes.VALUES.forEach(skill -> skill.getAbilities().removeIf(ability -> !ability.isEnabled()));
+        // Registering Config Settings
+        Abilities.VALUES.removeIf(ability -> !config.getNode("abilities", ability.getId(), "enabled").getBoolean(true));
+        Abilities.VALUES.forEach(ability -> ability.setValues(config.getNode("abilities", ability.getId())));
+        SkillTypes.VALUES.removeIf(skill -> !config.getNode("skills", skill.getId(), "enabled").getBoolean(true));
+        SkillTypes.VALUES.forEach(skill -> skill.getAbilities().removeIf(ability -> !ability.isEnabled()));
 
-		// Initializing Managers
-		// TODO: Fully implement SQL
-		// TODO: Config option to choose storage type
-		this.playerdata = new HoconPlayerDatabase(this, this.configdir.resolve("playerdata"));
-		this.tops = new HoconTopDatabase(this, this.configdir.resolve("tops.conf"));
-		this.itemdata = new HoconItemDatabase(this, this.configdir.resolve("itemdata.conf"));
+        // Initializing Managers
+        // TODO: Fully implement SQL
+        // TODO: Config option to choose storage type
+        String storageType = config.getNode("storage").getNode("type").getString();
 
-		this.menus = new MenuManager(this);
-		this.messages = new MessageManager(this, config.getNode("messages"));
-		this.doubledrops = new DoubleDropManager(this);
-		this.choices = new ChoiceMaps();
+        if (storageType == null || storageType.equalsIgnoreCase("hocon")) {
+            this.playerdata = new HoconPlayerDatabase(this, this.configdir.resolve("playerdata"));
+            this.tops = new HoconTopDatabase(this, this.configdir.resolve("tops.conf"));
+            this.itemdata = new HoconItemDatabase(this, this.configdir.resolve("itemdata.conf"));
+        } else if (storageType.equalsIgnoreCase("mysql")) {
 
-		// Registering Commands
-		this.game.getCommandManager().register(this,
-				CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | Skills Command"))
-						.arguments(GenericArguments
-								.optionalWeak(GenericArguments.choices(Text.of("skill"), this.choices.getSkills())))
-						.executor(new CommandSkills(this)).build(),
-				config.getNode("commands", "skills").getList(obj -> (String) obj));
+        }
 
-		this.game.getCommandManager().register(this,
-				CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | Top Command"))
-						.arguments(GenericArguments
-								.optionalWeak(GenericArguments.choices(Text.of("skill"), this.choices.getSkills())))
-						.executor(new CommandTop(this)).build(),
-				config.getNode("commands", "tops").getList(obj -> (String) obj));
+        this.menus = new MenuManager(this);
+        this.messages = new MessageManager(this, config.getNode("messages"));
+        this.doubledrops = new DoubleDropManager(this);
+        this.choices = new ChoiceMaps();
 
-		this.game.getCommandManager().register(this,
-				CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | Settings Command"))
-						.executor(new CommandSettings(this)).build(),
-				config.getNode("commands", "settings").getList(obj -> (String) obj));
+        // Registering Commands
+        this.game.getCommandManager().register(this,
+                CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | Skills Command"))
+                        .arguments(GenericArguments
+                                .optionalWeak(GenericArguments.choices(Text.of("skill"), this.choices.getSkills())))
+                        .executor(new CommandSkills(this)).build(),
+                config.getNode("commands", "skills").getList(obj -> (String) obj));
 
-		SkillTypes.VALUES.stream().filter(skill -> config.getNode("commands", skill.getId()).getBoolean(true))
-				.forEach(skill -> {
-					this.game.getCommandManager().register(this, CommandSpec.builder()
-							.description(Text.of(TextColors.BLUE, "AdventureMMO | ", skill.getName(), " Command"))
-							.executor(new CommandSkill(this, skill)).build(), skill.getId());
-				});
+        this.game.getCommandManager().register(this,
+                CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | Top Command"))
+                        .arguments(GenericArguments
+                                .optionalWeak(GenericArguments.choices(Text.of("skill"), this.choices.getSkills())))
+                        .executor(new CommandTop(this)).build(),
+                config.getNode("commands", "tops").getList(obj -> (String) obj));
 
-		// Admin Commands
-		this.game.getCommandManager().register(this, CommandSpec.builder()
-				.child(CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | Reload Command"))
-						.permission("mmo.admin.reload").executor(new CommandReload(this)).build(), "reload")
-				.child(CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | View Command"))
-						.permission("mmo.admin.view").arguments(GenericArguments.user(Text.of("user")))
-						.executor(new CommandView(this)).build(), "view")
-				.child(CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | Set Command"))
-						.permission("mmo.admin.set")
-						.arguments(GenericArguments.user(Text.of("user")),
-								GenericArguments.choices(Text.of("skill"), this.choices.getSkills()),
-								GenericArguments.integer(Text.of("level")),
-								GenericArguments.optionalWeak(GenericArguments.integer(Text.of("exp"))))
-						.executor(new CommandSet(this)).build(), "set")
-				.child(CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | SetItem Command"))
-						.permission("mmo.admin.setitem")
-						.arguments(GenericArguments.choices(Text.of("tooltype"), this.choices.getTools()))
-						.executor(new CommandItemSet(this)).build(), "setitem")
-				.child(CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | SetBlock Command"))
-						.permission("mmo.admin.setblock")
-						.arguments(GenericArguments.choices(Text.of("skill"), this.choices.getSkills()),
-								GenericArguments.integer(Text.of("exp")))
-						.executor(new CommandBlockSet(this)).build(), "setblock")
-				.child(CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | ClearItem Command"))
-						.permission("mmo.admin.clearitem").executor(new CommandItemClear(this)).build(), "clearitem")
-				.child(CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | ClearBlock Command"))
-						.permission("mmo.admin.clearblock").executor(new CommandBlockClear(this)).build(), "clearblock")
-				.build(), "mmoadmin");
+        this.game.getCommandManager().register(this,
+                CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | Settings Command"))
+                        .executor(new CommandSettings(this)).build(),
+                config.getNode("commands", "settings").getList(obj -> (String) obj));
 
-		// Registering Listeners
-		SkillTypes.VALUES.forEach(
-				skill -> this.game.getEventManager().registerListeners(this, skill.getListener().apply(this, config)));
-		this.game.getEventManager().registerListeners(this, new ClientListener(this));
-		this.game.getEventManager().registerListeners(this, new AbilitiesListener(this, config));
-		this.game.getEventManager().registerListeners(this, new WorldListener(this));
-		this.game.getEventManager().registerListeners(this, this.doubledrops);
-		if (config.getNode("economy", "enabled").getBoolean()) {
-			try {
-				this.game.getEventManager().registerListeners(this, new EconomyListener(this, config));
-			} catch (final ServiceException exc) {
-				this.logger.error("No Economy Service was found! Install one or disable economy in the config file: {}", exc);
-			}
-		}
-		this.logger.info("Loaded plugin successfully in {} milliseconds.", System.currentTimeMillis() - startuptime);
-	}
+        SkillTypes.VALUES.stream().filter(skill -> config.getNode("commands", skill.getId()).getBoolean(true))
+                .forEach(skill -> {
+                    this.game.getCommandManager().register(this, CommandSpec.builder()
+                            .description(Text.of(TextColors.BLUE, "AdventureMMO | ", skill.getName(), " Command"))
+                            .executor(new CommandSkill(this, skill)).build(), skill.getId());
+                });
 
-	@Listener
-	public void onStopping(@Nullable final GameStoppingEvent e) {
-		this.game.getServer().getOnlinePlayers().forEach(p -> ItemUtils.restoreSuperTool(p, this.container));
-		this.playerdata.unloadAll();
-	}
+        // Admin Commands
+        this.game.getCommandManager().register(this, CommandSpec.builder()
+                .child(CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | Reload Command"))
+                        .permission("mmo.admin.reload").executor(new CommandReload(this)).build(), "reload")
+                .child(CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | View Command"))
+                        .permission("mmo.admin.view").arguments(GenericArguments.user(Text.of("user")))
+                        .executor(new CommandView(this)).build(), "view")
+                .child(CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | Set Command"))
+                        .permission("mmo.admin.set")
+                        .arguments(GenericArguments.user(Text.of("user")),
+                                GenericArguments.choices(Text.of("skill"), this.choices.getSkills()),
+                                GenericArguments.integer(Text.of("level")),
+                                GenericArguments.optionalWeak(GenericArguments.integer(Text.of("exp"))))
+                        .executor(new CommandSet(this)).build(), "set")
+                .child(CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | SetItem Command"))
+                        .permission("mmo.admin.setitem")
+                        .arguments(GenericArguments.choices(Text.of("tooltype"), this.choices.getTools()))
+                        .executor(new CommandItemSet(this)).build(), "setitem")
+                .child(CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | SetBlock Command"))
+                        .permission("mmo.admin.setblock")
+                        .arguments(GenericArguments.choices(Text.of("skill"), this.choices.getSkills()),
+                                GenericArguments.integer(Text.of("exp")))
+                        .executor(new CommandBlockSet(this)).build(), "setblock")
+                .child(CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | ClearItem Command"))
+                        .permission("mmo.admin.clearitem").executor(new CommandItemClear(this)).build(), "clearitem")
+                .child(CommandSpec.builder().description(Text.of(TextColors.BLUE, "AdventureMMO | ClearBlock Command"))
+                        .permission("mmo.admin.clearblock").executor(new CommandBlockClear(this)).build(), "clearblock")
+                .build(), "mmoadmin");
 
-	@Listener
-	public void onReload(@Nullable final GameReloadEvent e) {
-		this.logger.info("Reloading...");
+        // Registering Listeners
+        SkillTypes.VALUES.forEach(
+                skill -> this.game.getEventManager().registerListeners(this, skill.getListener().apply(this, config)));
+        this.game.getEventManager().registerListeners(this, new ClientListener(this));
+        this.game.getEventManager().registerListeners(this, new AbilitiesListener(this, config));
+        this.game.getEventManager().registerListeners(this, new WorldListener(this));
+        this.game.getEventManager().registerListeners(this, this.doubledrops);
+        if (config.getNode("economy", "enabled").getBoolean()) {
+            try {
+                this.game.getEventManager().registerListeners(this, new EconomyListener(this, config));
+            } catch (final ServiceException exc) {
+                this.logger.error("No Economy Service was found! Install one or disable economy in the config file: {}", exc);
+            }
+        }
+        this.logger.info("Loaded plugin successfully in {} milliseconds.", System.currentTimeMillis() - startuptime);
+    }
 
-		this.onStopping(null);
+    @Listener
+    public void onStopping(@Nullable final GameStoppingEvent e) {
+        this.game.getServer().getOnlinePlayers().forEach(p -> ItemUtils.restoreSuperTool(p, this.container));
+        this.playerdata.unloadAll();
+    }
 
-		this.game.getEventManager().unregisterPluginListeners(this);
-		this.game.getScheduler().getScheduledTasks(this).forEach(Task::cancel);
-		this.game.getCommandManager().getOwnedBy(this).forEach(this.game.getCommandManager()::removeMapping);
+    @Listener
+    public void onReload(@Nullable final GameReloadEvent e) {
+        this.logger.info("Reloading...");
 
-		this.onInit(null);
+        this.onStopping(null);
 
-		this.logger.info("Reloaded successfully.");
-	}
+        this.game.getEventManager().unregisterPluginListeners(this);
+        this.game.getScheduler().getScheduledTasks(this).forEach(Task::cancel);
+        this.game.getCommandManager().getOwnedBy(this).forEach(this.game.getCommandManager()::removeMapping);
 
-	@Nonnull
-	public Game getGame() {
-		return this.game;
-	}
+        this.onInit(null);
 
-	@Nonnull
-	public Logger getLogger() {
-		return this.logger;
-	}
+        this.logger.info("Reloaded successfully.");
+    }
 
-	@Nonnull
-	public PluginContainer getContainer() {
-		return this.container;
-	}
+    @Nonnull
+    public Game getGame() {
+        return this.game;
+    }
 
-	@Nonnull
-	public PlayerDatabase getPlayerDatabase() {
-		return this.playerdata;
-	}
+    @Nonnull
+    public Logger getLogger() {
+        return this.logger;
+    }
 
-	@Nonnull
-	public TopDatabase getTops() {
-		return this.tops;
-	}
+    @Nonnull
+    public PluginContainer getContainer() {
+        return this.container;
+    }
 
-	@Nonnull
-	public ItemDatabase getItemDatabase() {
-		return this.itemdata;
-	}
+    @Nonnull
+    public PlayerDatabase getPlayerDatabase() {
+        return this.playerdata;
+    }
 
-	@Nonnull
-	public MenuManager getMenus() {
-		return this.menus;
-	}
+    @Nonnull
+    public TopDatabase getTops() {
+        return this.tops;
+    }
 
-	@Nonnull
-	public MessageManager getMessages() {
-		return this.messages;
-	}
+    @Nonnull
+    public ItemDatabase getItemDatabase() {
+        return this.itemdata;
+    }
 
-	@Nonnull
-	public DoubleDropManager getDoubleDrops() {
-		return this.doubledrops;
-	}
+    @Nonnull
+    public MenuManager getMenus() {
+        return this.menus;
+    }
 
-	@Nonnull
-	public ChoiceMaps getChoices() {
-		return this.choices;
-	}
+    @Nonnull
+    public MessageManager getMessages() {
+        return this.messages;
+    }
+
+    @Nonnull
+    public DoubleDropManager getDoubleDrops() {
+        return this.doubledrops;
+    }
+
+    @Nonnull
+    public ChoiceMaps getChoices() {
+        return this.choices;
+    }
 }

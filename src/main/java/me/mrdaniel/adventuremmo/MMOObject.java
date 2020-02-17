@@ -9,34 +9,34 @@ import org.spongepowered.api.plugin.PluginContainer;
 
 public abstract class MMOObject {
 
-	private final AdventureMMO mmo;
+    private final AdventureMMO mmo;
 
-	public MMOObject(@Nonnull final AdventureMMO mmo) {
-		this.mmo = mmo;
-	}
+    public MMOObject(@Nonnull final AdventureMMO mmo) {
+        this.mmo = mmo;
+    }
 
-	@Nonnull
-	public AdventureMMO getMMO() {
-		return this.mmo;
-	}
+    @Nonnull
+    public AdventureMMO getMMO() {
+        return this.mmo;
+    }
 
-	@Nonnull
-	public PluginContainer getContainer() {
-		return this.mmo.getContainer();
-	}
+    @Nonnull
+    public PluginContainer getContainer() {
+        return this.mmo.getContainer();
+    }
 
-	@Nonnull
-	public Logger getLogger() {
-		return this.mmo.getLogger();
-	}
+    @Nonnull
+    public Logger getLogger() {
+        return this.mmo.getLogger();
+    }
 
-	@Nonnull
-	public Game getGame() {
-		return this.mmo.getGame();
-	}
+    @Nonnull
+    public Game getGame() {
+        return this.mmo.getGame();
+    }
 
-	@Nonnull
-	public Server getServer() {
-		return this.mmo.getGame().getServer();
-	}
+    @Nonnull
+    public Server getServer() {
+        return this.mmo.getGame().getServer();
+    }
 }

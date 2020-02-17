@@ -9,13 +9,13 @@ import org.spongepowered.api.registry.CatalogRegistryModule;
 
 public class SkillTypeRegistryModule implements CatalogRegistryModule<SkillType> {
 
-	@Override
-	public Optional<SkillType> getById(@Nonnull final String id) {
-		return SkillTypes.of(id);
-	}
+    @Override
+    public Optional<SkillType> getById(@Nonnull final String id) {
+        return SkillTypes.of(id);
+    }
 
-	@Override
-	public Collection<SkillType> getAll() {
-		return SkillTypes.VALUES;
-	}
+    @Override
+    public Collection<SkillType> getAll() {
+        return SkillTypes.VALUES;
+    }
 }

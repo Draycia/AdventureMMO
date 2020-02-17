@@ -13,17 +13,17 @@ import org.spongepowered.api.world.World;
 
 public class ServerUtils {
 
-	@Nonnull
-	public static Optional<Location<World>> getFirstBlock(@Nonnull final Player p) {
+    @Nonnull
+    public static Optional<Location<World>> getFirstBlock(@Nonnull final Player p) {
 
-		for (BlockRayHit<World> worldBlockRayHit : BlockRay.from(p).distanceLimit(50)) {
-			Location<World> loc = worldBlockRayHit.getLocation();
+        for (BlockRayHit<World> worldBlockRayHit : BlockRay.from(p).distanceLimit(50)) {
+            Location<World> loc = worldBlockRayHit.getLocation();
 
-			if (loc.getBlockType() != BlockTypes.AIR) {
-				return Optional.of(loc);
-			}
-		}
+            if (loc.getBlockType() != BlockTypes.AIR) {
+                return Optional.of(loc);
+            }
+        }
 
-		return Optional.empty();
-	}
+        return Optional.empty();
+    }
 }

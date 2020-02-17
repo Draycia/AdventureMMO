@@ -19,26 +19,26 @@ import me.mrdaniel.adventuremmo.utils.ServerUtils;
 
 public class CommandBlockSet extends PlayerCommand {
 
-	private final AdventureMMO mmo;
+    private final AdventureMMO mmo;
 
-	public CommandBlockSet(@Nonnull final AdventureMMO mmo) {
-		this.mmo = mmo;
-	}
+    public CommandBlockSet(@Nonnull final AdventureMMO mmo) {
+        this.mmo = mmo;
+    }
 
-	@Override
-	public void execute(final Player p, final CommandContext args) {
-		Optional<Location<World>> loc = ServerUtils.getFirstBlock(p);
+    @Override
+    public void execute(final Player p, final CommandContext args) {
+        Optional<Location<World>> loc = ServerUtils.getFirstBlock(p);
 
-		if (!loc.isPresent()) {
-			p.sendMessage(Text.of(TextColors.RED, "You must be looking at a block."));
-			return;
-		}
+        if (!loc.isPresent()) {
+            p.sendMessage(Text.of(TextColors.RED, "You must be looking at a block."));
+            return;
+        }
 
-		BlockType block = loc.get().getBlockType();
-		SkillType skill = args.<SkillType>getOne("skill").get();
-		int exp = args.<Integer>getOne("exp").get();
+        BlockType block = loc.get().getBlockType();
+        SkillType skill = args.<SkillType>getOne("skill").get();
+        int exp = args.<Integer>getOne("exp").get();
 
-		this.mmo.getItemDatabase().set(block, skill, exp);
-		this.mmo.getMessages().sendBlockSet(p, block, skill, exp);
-	}
+        this.mmo.getItemDatabase().set(block, skill, exp);
+        this.mmo.getMessages().sendBlockSet(p, block, skill, exp);
+    }
 }

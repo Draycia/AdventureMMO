@@ -11,14 +11,14 @@ import me.mrdaniel.adventuremmo.catalogtypes.skills.SkillType;
 
 public class CommandTop extends PlayerCommand {
 
-	private final AdventureMMO mmo;
+    private final AdventureMMO mmo;
 
-	public CommandTop(@Nonnull final AdventureMMO mmo) {
-		this.mmo = mmo;
-	}
+    public CommandTop(@Nonnull final AdventureMMO mmo) {
+        this.mmo = mmo;
+    }
 
-	@Override
-	public void execute(final Player p, final CommandContext args) {
-		this.mmo.getMenus().sendSkillTop(p, args.<SkillType>getOne("skill").orElse(null));
-	}
+    @Override
+    public void execute(final Player p, final CommandContext args) {
+        this.mmo.getMenus().sendSkillTop(p, args.<SkillType>getOne("skill").orElse(null));
+    }
 }

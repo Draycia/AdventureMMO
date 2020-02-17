@@ -17,18 +17,18 @@ import me.mrdaniel.adventuremmo.io.playerdata.PlayerData;
 
 public class CommandView extends MMOObject implements CommandExecutor {
 
-	public CommandView(@Nonnull final AdventureMMO mmo) {
-		super(mmo);
-	}
+    public CommandView(@Nonnull final AdventureMMO mmo) {
+        super(mmo);
+    }
 
-	@Override
-	public CommandResult execute(final CommandSource src, final CommandContext args) throws CommandException {
-		User user = args.<User>getOne("user").get();
-		PlayerData data = super.getMMO().getPlayerDatabase().getOffline(user.getUniqueId())
-				.orElseThrow(() -> new CommandException(Text.of(TextColors.RED, "Invalid User!")));
+    @Override
+    public CommandResult execute(final CommandSource src, final CommandContext args) throws CommandException {
+        User user = args.<User>getOne("user").get();
+        PlayerData data = super.getMMO().getPlayerDatabase().getOffline(user.getUniqueId())
+                .orElseThrow(() -> new CommandException(Text.of(TextColors.RED, "Invalid User!")));
 
-		super.getMMO().getMenus().sendAdminView(src, data, user.getName());
+        super.getMMO().getMenus().sendAdminView(src, data, user.getName());
 
-		return CommandResult.success();
-	}
+        return CommandResult.success();
+    }
 }

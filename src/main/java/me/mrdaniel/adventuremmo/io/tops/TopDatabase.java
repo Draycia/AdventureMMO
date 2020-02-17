@@ -8,7 +8,7 @@ import me.mrdaniel.adventuremmo.catalogtypes.skills.SkillType;
 
 public interface TopDatabase {
 
-	void update(String player, SkillType skill, int level);
+    void update(String player, SkillType skill, int level);
 
-	Map<Integer, Tuple<String, Integer>> getTop(SkillType skill);
+    Map<Integer, Tuple<String, Integer>> getTop(SkillType skill);
 }

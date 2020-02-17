@@ -10,14 +10,14 @@ import me.mrdaniel.adventuremmo.AdventureMMO;
 
 public class CommandSettings extends PlayerCommand {
 
-	private final AdventureMMO mmo;
+    private final AdventureMMO mmo;
 
-	public CommandSettings(@Nonnull final AdventureMMO mmo) {
-		this.mmo = mmo;
-	}
+    public CommandSettings(@Nonnull final AdventureMMO mmo) {
+        this.mmo = mmo;
+    }
 
-	@Override
-	public void execute(final Player p, final CommandContext args) {
-		this.mmo.getMenus().sendSettingsInfo(p);
-	}
+    @Override
+    public void execute(final Player p, final CommandContext args) {
+        this.mmo.getMenus().sendSettingsInfo(p);
+    }
 }

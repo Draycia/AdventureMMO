@@ -11,16 +11,16 @@ import me.mrdaniel.adventuremmo.catalogtypes.skills.SkillType;
 
 public class CommandSkill extends PlayerCommand {
 
-	private final AdventureMMO mmo;
-	private final SkillType skill;
+    private final AdventureMMO mmo;
+    private final SkillType skill;
 
-	public CommandSkill(@Nonnull final AdventureMMO mmo, @Nonnull final SkillType skill) {
-		this.mmo = mmo;
-		this.skill = skill;
-	}
+    public CommandSkill(@Nonnull final AdventureMMO mmo, @Nonnull final SkillType skill) {
+        this.mmo = mmo;
+        this.skill = skill;
+    }
 
-	@Override
-	public void execute(final Player p, final CommandContext args) {
-		this.mmo.getMenus().sendSkillInfo(p, this.skill);
-	}
+    @Override
+    public void execute(final Player p, final CommandContext args) {
+        this.mmo.getMenus().sendSkillInfo(p, this.skill);
+    }
 }

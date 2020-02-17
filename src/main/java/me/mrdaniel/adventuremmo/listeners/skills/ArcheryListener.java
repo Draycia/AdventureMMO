@@ -25,45 +25,45 @@ import me.mrdaniel.adventuremmo.io.playerdata.PlayerData;
 
 public class ArcheryListener extends MMOObject {
 
-	private final int damage_exp;
-	private final int kill_exp;
+    private final int damage_exp;
+    private final int kill_exp;
 
-	public ArcheryListener(@Nonnull final AdventureMMO mmo, final int damage_exp, final int kill_exp) {
-		super(mmo);
+    public ArcheryListener(@Nonnull final AdventureMMO mmo, final int damage_exp, final int kill_exp) {
+        super(mmo);
 
-		this.damage_exp = damage_exp;
-		this.kill_exp = kill_exp;
-	}
+        this.damage_exp = damage_exp;
+        this.kill_exp = kill_exp;
+    }
 
-	@Listener(order = Order.LATE)
-	@IsCancelled(value = Tristate.FALSE)
-	public void onDamage(final DamageEntityEvent e, @First final EntityDamageSource source) {
-		if (source.getSource() instanceof Arrow) {
-			Arrow arrow = (Arrow) source.getSource();
-			if (arrow.getShooter() instanceof Player) {
-				super.getMMO().getPlayerDatabase().addExp(super.getMMO(), (Player) arrow.getShooter(),
-						SkillTypes.ARCHERY, e.willCauseDeath() ? this.kill_exp : this.damage_exp);
-			}
-		}
-	}
+    @Listener(order = Order.LATE)
+    @IsCancelled(value = Tristate.FALSE)
+    public void onDamage(final DamageEntityEvent e, @First final EntityDamageSource source) {
+        if (source.getSource() instanceof Arrow) {
+            Arrow arrow = (Arrow) source.getSource();
+            if (arrow.getShooter() instanceof Player) {
+                super.getMMO().getPlayerDatabase().addExp(super.getMMO(), (Player) arrow.getShooter(),
+                        SkillTypes.ARCHERY, e.willCauseDeath() ? this.kill_exp : this.damage_exp);
+            }
+        }
+    }
 
-	@Listener(order = Order.LATE)
-	@IsCancelled(value = Tristate.FALSE)
-	public void onArrowFire(final LaunchProjectileEvent e) {
-		if (e.getTargetEntity() instanceof Arrow && e.getTargetEntity().getShooter() instanceof Player) {
-			Player p = (Player) e.getTargetEntity().getShooter();
-			PlayerData data = super.getMMO().getPlayerDatabase().get(p.getUniqueId());
+    @Listener(order = Order.LATE)
+    @IsCancelled(value = Tristate.FALSE)
+    public void onArrowFire(final LaunchProjectileEvent e) {
+        if (e.getTargetEntity() instanceof Arrow && e.getTargetEntity().getShooter() instanceof Player) {
+            Player p = (Player) e.getTargetEntity().getShooter();
+            PlayerData data = super.getMMO().getPlayerDatabase().get(p.getUniqueId());
 
-			if (Abilities.ARROW_RAIN.getChance(data.getLevel(SkillTypes.ARCHERY))) {
-				e.getTargetEntity().offer(Keys.FIRE_TICKS, 1000);
-				EntityArchetype a = e.getTargetEntity().createArchetype();
-				Vector3d v = e.getTargetEntity().getVelocity();
-				for (int i = 0; i < 9; i++) {
-					a.offer(Keys.VELOCITY, v.add(0.05 - (Math.random() * 0.1), 0.05 - (Math.random() * 0.1),
-							0.05 - (Math.random() * 0.1)));
-					a.apply(e.getTargetEntity().getLocation());
-				}
-			}
-		}
-	}
+            if (Abilities.ARROW_RAIN.getChance(data.getLevel(SkillTypes.ARCHERY))) {
+                e.getTargetEntity().offer(Keys.FIRE_TICKS, 1000);
+                EntityArchetype a = e.getTargetEntity().createArchetype();
+                Vector3d v = e.getTargetEntity().getVelocity();
+                for (int i = 0; i < 9; i++) {
+                    a.offer(Keys.VELOCITY, v.add(0.05 - (Math.random() * 0.1), 0.05 - (Math.random() * 0.1),
+                            0.05 - (Math.random() * 0.1)));
+                    a.apply(e.getTargetEntity().getLocation());
+                }
+            }
+        }
+    }
 }

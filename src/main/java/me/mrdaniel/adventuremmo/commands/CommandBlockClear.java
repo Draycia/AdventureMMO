@@ -18,24 +18,24 @@ import me.mrdaniel.adventuremmo.utils.ServerUtils;
 
 public class CommandBlockClear extends PlayerCommand {
 
-	private final AdventureMMO mmo;
+    private final AdventureMMO mmo;
 
-	public CommandBlockClear(@Nonnull final AdventureMMO mmo) {
-		this.mmo = mmo;
-	}
+    public CommandBlockClear(@Nonnull final AdventureMMO mmo) {
+        this.mmo = mmo;
+    }
 
-	@Override
-	public void execute(final Player p, final CommandContext args) {
-		Optional<Location<World>> loc = ServerUtils.getFirstBlock(p);
+    @Override
+    public void execute(final Player p, final CommandContext args) {
+        Optional<Location<World>> loc = ServerUtils.getFirstBlock(p);
 
-		if (!loc.isPresent()) {
-			p.sendMessage(Text.of(TextColors.RED, "You must be looking at a block."));
-			return;
-		}
+        if (!loc.isPresent()) {
+            p.sendMessage(Text.of(TextColors.RED, "You must be looking at a block."));
+            return;
+        }
 
-		BlockType block = loc.get().getBlockType();
+        BlockType block = loc.get().getBlockType();
 
-		this.mmo.getItemDatabase().remove(block);
-		this.mmo.getMessages().sendBlockClear(p, block);
-	}
+        this.mmo.getItemDatabase().remove(block);
+        this.mmo.getMessages().sendBlockClear(p, block);
+    }
 }

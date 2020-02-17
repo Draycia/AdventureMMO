@@ -13,15 +13,15 @@ import me.mrdaniel.adventuremmo.MMOObject;
 
 public class CommandReload extends MMOObject implements CommandExecutor {
 
-	public CommandReload(@Nonnull final AdventureMMO mmo) {
-		super(mmo);
-	}
+    public CommandReload(@Nonnull final AdventureMMO mmo) {
+        super(mmo);
+    }
 
-	@Override
-	public CommandResult execute(final CommandSource src, final CommandContext args) {
-		super.getMMO().onReload(null);
-		super.getMMO().getMessages().sendReload(src);
+    @Override
+    public CommandResult execute(final CommandSource src, final CommandContext args) {
+        super.getMMO().onReload(null);
+        super.getMMO().getMessages().sendReload(src);
 
-		return CommandResult.success();
-	}
+        return CommandResult.success();
+    }
 }

@@ -9,13 +9,13 @@ import org.spongepowered.api.registry.CatalogRegistryModule;
 
 public class ToolTypeRegistryModule implements CatalogRegistryModule<ToolType> {
 
-	@Override
-	public Optional<ToolType> getById(@Nonnull final String id) {
-		return ToolTypes.of(id);
-	}
+    @Override
+    public Optional<ToolType> getById(@Nonnull final String id) {
+        return ToolTypes.of(id);
+    }
 
-	@Override
-	public Collection<ToolType> getAll() {
-		return ToolTypes.VALUES;
-	}
+    @Override
+    public Collection<ToolType> getAll() {
+        return ToolTypes.VALUES;
+    }
 }

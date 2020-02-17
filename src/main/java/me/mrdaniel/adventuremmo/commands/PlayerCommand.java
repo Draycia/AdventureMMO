@@ -11,19 +11,19 @@ import org.spongepowered.api.text.format.TextColors;
 
 public abstract class PlayerCommand implements CommandExecutor {
 
-	@Override
-	public CommandResult execute(final CommandSource src, final CommandContext args) throws CommandException {
-		if (!(src instanceof Player)) {
-			src.sendMessage(Text.of(TextColors.RED, "This commands is for players only."));
-			return CommandResult.success();
-		}
+    @Override
+    public CommandResult execute(final CommandSource src, final CommandContext args) throws CommandException {
+        if (!(src instanceof Player)) {
+            src.sendMessage(Text.of(TextColors.RED, "This commands is for players only."));
+            return CommandResult.success();
+        }
 
-		Player p = (Player) src;
+        Player p = (Player) src;
 
-		this.execute(p, args);
+        this.execute(p, args);
 
-		return CommandResult.success();
-	}
+        return CommandResult.success();
+    }
 
-	public abstract void execute(Player p, CommandContext args) throws CommandException;
+    public abstract void execute(Player p, CommandContext args) throws CommandException;
 }
