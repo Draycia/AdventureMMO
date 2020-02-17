@@ -93,9 +93,9 @@ public class AdventureMMO {
 
 	@Inject
 	public AdventureMMO(final Game game, @ConfigDir(sharedRoot = false) final Path path,
-			final PluginContainer container, final MetricsLite metrics) {
+			final PluginContainer container, Logger logger, final MetricsLite metrics) {
 		this.game = game;
-		this.logger = LoggerFactory.getLogger("AdventureMMO");
+		this.logger = logger;
 		this.configdir = path;
 		this.container = container;
 
