@@ -40,13 +40,13 @@ public class ExcavationListener extends ActiveAbilityListener {
 		config.getNode("abilities", "treasurehunt", "loot").getChildrenMap().forEach((typeO, node) -> {
 			Optional<ItemType> type = mmo.getGame().getRegistry().getType(ItemType.class, (String) typeO);
 			if (type.isPresent()) {
-				this.drops.put(node.getNode("lvl").getInt(0), new Tuple<Double, ItemInfo>(
+				this.drops.put(node.getNode("lvl").getInt(0), new Tuple<>(
 						node.getNode("chance").getDouble(1),
 						new ItemInfo(type.get(), node.getNode("min_amount").getInt(1),
 								node.getNode("max_amount").getInt(1), node.getNode("min_damage").getInt(0),
 								node.getNode("max_damage").getInt(0), node.getNode("enchanted").getBoolean(false))));
 			} else {
-				mmo.getLogger().error("Failed to find itemtype for: {}", (String) typeO);
+				mmo.getLogger().error("Failed to find itemtype for: {}", typeO);
 			}
 		});
 

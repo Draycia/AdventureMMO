@@ -169,9 +169,10 @@ public class MenuManager {
 			lines.put(i++, this.getBoardTitle(ability.getName(), true));
 			lines.put(i++, this.getEmptyLine());
 		}
+
 		lines.put(i++, Text.of(TextColors.GREEN, "EXP: ", data.getExp(skill), " / ",
 				MathUtils.expTillNextLevel(data.getLevel(skill))));
-		lines.put(i++, Text.of(TextColors.GREEN, "Level: ", data.getLevel(skill)));
+		lines.put(i, Text.of(TextColors.GREEN, "Level: ", data.getLevel(skill)));
 
 		return lines;
 	}
@@ -200,14 +201,17 @@ public class MenuManager {
 
 	@Nonnull
 	private Text getEmptyLine() {
-		String str = "";
+		StringBuilder str = new StringBuilder();
+
 		for (int i = 0; i < this.i; i++) {
-			str += " ";
+			str.append(" ");
 		}
+
 		if (this.i++ > 8) {
 			this.i = 0;
 		}
-		return Text.of(str);
+
+		return Text.of(str.toString());
 	}
 
 	@Nonnull

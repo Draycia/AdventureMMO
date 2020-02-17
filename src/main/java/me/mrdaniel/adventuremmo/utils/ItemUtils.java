@@ -123,7 +123,7 @@ public class ItemUtils {
 		List<Enchantment> enchants = Lists.newArrayList();
 		mmo.getGame().getRegistry().getAllOf(EnchantmentType.class).forEach(ench -> {
 			if (Math.random() > 0.9 && ench.canBeAppliedByTable(item)) {
-				enchants.add(Enchantment.of(ench, (int) Math.random() * ench.getMaximumLevel() + 1));
+				enchants.add(Enchantment.of(ench, (int)(Math.random() * ench.getMaximumLevel() + 1) ));
 			}
 		});
 		item.offer(Keys.ITEM_ENCHANTMENTS, enchants);

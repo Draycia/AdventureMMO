@@ -30,7 +30,7 @@ public class AcrobaticsListener extends MMOObject {
 
 	@Listener(order = Order.LATE)
 	@IsCancelled(value = Tristate.FALSE)
-	public void onDamange(final DamageEntityEvent e) {
+	public void onDamage(final DamageEntityEvent e) {
 		if (e.getTargetEntity() instanceof Player) {
 			Player p = (Player) e.getTargetEntity();
 

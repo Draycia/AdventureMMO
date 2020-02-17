@@ -51,13 +51,13 @@ public class FishingListener extends ActiveAbilityListener {
 		config.getNode("abilities", "watertreasure", "loot").getChildrenMap().forEach((typeO, node) -> {
 			Optional<ItemType> type = mmo.getGame().getRegistry().getType(ItemType.class, (String) typeO);
 			if (type.isPresent()) {
-				this.drops.put(node.getNode("lvl").getInt(0), new Tuple<Double, ItemInfo>(
+				this.drops.put(node.getNode("lvl").getInt(0), new Tuple<>(
 						node.getNode("chance").getDouble(1),
 						new ItemInfo(type.get(), node.getNode("min_amount").getInt(1),
 								node.getNode("max_amount").getInt(1), node.getNode("min_damage").getInt(0),
 								node.getNode("max_damage").getInt(0), node.getNode("enchanted").getBoolean(false))));
 			} else {
-				mmo.getLogger().error("Failed to find itemtype for: {}", (String) typeO);
+				mmo.getLogger().error("Failed to find itemtype for: {}", typeO);
 			}
 		});
 
@@ -92,10 +92,12 @@ public class FishingListener extends ActiveAbilityListener {
 	private ItemStack getDrop(final int level) {
 		for (int i = this.levels.size() - 1; i >= 0; i--) {
 			int l = this.levels.get(i);
+
 			if (level >= l && this.drops.get(l).getFirst() > Math.random() * 100) {
 				return this.drops.get(l).getSecond().create(super.getMMO());
 			}
 		}
-		return ItemUtils.build(ItemTypes.DYE, (int) Math.random() * 11 + 10, 4);
+
+		return ItemUtils.build(ItemTypes.DYE, (int)(Math.random() * 11 + 10), 4);
 	}
 }

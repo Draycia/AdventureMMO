@@ -25,8 +25,9 @@ public class CommandBlockClear extends PlayerCommand {
 	}
 
 	@Override
-	public void execute(final Player p, final CommandContext args) throws CommandException {
+	public void execute(final Player p, final CommandContext args) {
 		Optional<Location<World>> loc = ServerUtils.getFirstBlock(p);
+
 		if (!loc.isPresent()) {
 			p.sendMessage(Text.of(TextColors.RED, "You must be looking at a block."));
 			return;

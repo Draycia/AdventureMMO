@@ -28,6 +28,7 @@ public class CommandView extends MMOObject implements CommandExecutor {
 				.orElseThrow(() -> new CommandException(Text.of(TextColors.RED, "Invalid User!")));
 
 		super.getMMO().getMenus().sendAdminView(src, data, user.getName());
+
 		return CommandResult.success();
 	}
 }

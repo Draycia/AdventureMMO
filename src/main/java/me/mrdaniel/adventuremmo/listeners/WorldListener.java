@@ -16,6 +16,7 @@ import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
+import org.spongepowered.api.util.Identifiable;
 import org.spongepowered.api.util.Tristate;
 
 import me.mrdaniel.adventuremmo.AdventureMMO;
@@ -47,7 +48,7 @@ public class WorldListener extends MMOObject {
 			e.getTransactions()
 					.forEach(trans -> trans.getOriginal().getLocation()
 							.ifPresent(loc -> loc.getExtent().setCreator(loc.getBlockPosition(),
-									e.getCause().first(Player.class).map(p -> p.getUniqueId()).orElse(this.uuid))));
+									e.getCause().first(Player.class).map(Identifiable::getUniqueId).orElse(this.uuid))));
 		}
 	}
 

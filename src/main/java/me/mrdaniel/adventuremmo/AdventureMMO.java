@@ -22,6 +22,7 @@ import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStoppingEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -150,9 +151,12 @@ public class AdventureMMO {
 		SkillTypes.VALUES.forEach(skill -> skill.getAbilities().removeIf(ability -> !ability.isEnabled()));
 
 		// Initializing Managers
+		// TODO: Fully implement SQL
+		// TODO: Config option to choose storage type
 		this.playerdata = new HoconPlayerDatabase(this, this.configdir.resolve("playerdata"));
 		this.tops = new HoconTopDatabase(this, this.configdir.resolve("tops.conf"));
 		this.itemdata = new HoconItemDatabase(this, this.configdir.resolve("itemdata.conf"));
+
 		this.menus = new MenuManager(this);
 		this.messages = new MessageManager(this, config.getNode("messages"));
 		this.doubledrops = new DoubleDropManager(this);
@@ -225,8 +229,7 @@ public class AdventureMMO {
 			try {
 				this.game.getEventManager().registerListeners(this, new EconomyListener(this, config));
 			} catch (final ServiceException exc) {
-				this.logger.error("No Economy Service was found! Install one or disable economy in the config file: {}",
-						exc);
+				this.logger.error("No Economy Service was found! Install one or disable economy in the config file: {}", exc);
 			}
 		}
 		this.logger.info("Loaded plugin successfully in {} milliseconds.", System.currentTimeMillis() - startuptime);
@@ -245,7 +248,7 @@ public class AdventureMMO {
 		this.onStopping(null);
 
 		this.game.getEventManager().unregisterPluginListeners(this);
-		this.game.getScheduler().getScheduledTasks(this).forEach(task -> task.cancel());
+		this.game.getScheduler().getScheduledTasks(this).forEach(Task::cancel);
 		this.game.getCommandManager().getOwnedBy(this).forEach(this.game.getCommandManager()::removeMapping);
 
 		this.onInit(null);

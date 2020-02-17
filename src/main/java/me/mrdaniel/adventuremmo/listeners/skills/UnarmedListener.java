@@ -33,10 +33,11 @@ public class UnarmedListener extends ActiveAbilityListener {
 
 	@Listener
 	public void onTarget(final PlayerDamageEntityEvent e) {
-		if (e.getTool() != null && e.getTool() == super.tool) {
+		if (e.getTool() == super.tool) {
 			PlayerData pdata = super.getMMO().getPlayerDatabase().addExp(super.getMMO(), e.getPlayer(), super.skill,
 					e.isDeath() ? this.kill_exp : this.damage_exp);
 			Entity target = e.getEntity();
+
 			if (!e.isDeath()) {
 				if (Abilities.DISARM.getChance(pdata.getLevel(super.skill)) && target instanceof ArmorEquipable) {
 					ArmorEquipable ae = (ArmorEquipable) target;
@@ -46,6 +47,7 @@ public class UnarmedListener extends ActiveAbilityListener {
 						super.getMMO().getMessages().sendDisarm(e.getPlayer());
 					});
 				}
+
 				if (e.getPlayer().get(MMOData.class).orElse(new MMOData()).isAbilityActive(super.ability.getId())) {
 					Task.builder().delayTicks(0)
 							.execute(() -> target.setVelocity(target.getVelocity().mul(6.0, 3.0, 6.0)))

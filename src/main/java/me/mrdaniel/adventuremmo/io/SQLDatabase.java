@@ -42,7 +42,7 @@ public class SQLDatabase implements PlayerDatabase, ItemDatabase, TopDatabase {
 			}
 		}
 
-		this.players = new ConcurrentHashMap<UUID, SQLPlayerData>();
+		this.players = new ConcurrentHashMap<>();
 	}
 
 	// TopDatabase
@@ -86,7 +86,7 @@ public class SQLDatabase implements PlayerDatabase, ItemDatabase, TopDatabase {
 
 	@Override
 	public synchronized void unloadAll() {
-		this.players.values().forEach(data -> data.save());
+		this.players.values().forEach(SQLPlayerData::save);
 		this.players.clear();
 	}
 

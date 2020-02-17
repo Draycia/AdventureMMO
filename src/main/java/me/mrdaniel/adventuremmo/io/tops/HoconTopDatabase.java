@@ -64,7 +64,7 @@ public class HoconTopDatabase extends MMOObject implements TopDatabase {
 		Map<Integer, Tuple<String, Integer>> top = Maps.newHashMap();
 
 		for (int i = 1; i <= 10; i++) {
-			top.put(i, new Tuple<String, Integer>(node.getNode(String.valueOf(i), "name").getString(""),
+			top.put(i, new Tuple<>(node.getNode(String.valueOf(i), "name").getString(""),
 					node.getNode(String.valueOf(i), "level").getInt(0)));
 		}
 		return top;

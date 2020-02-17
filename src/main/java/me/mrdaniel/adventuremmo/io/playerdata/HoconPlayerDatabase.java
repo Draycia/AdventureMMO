@@ -34,10 +34,10 @@ public class HoconPlayerDatabase implements PlayerDatabase {
 		}
 
 		Task.builder().async().delay(30, TimeUnit.SECONDS).interval(30, TimeUnit.SECONDS).execute(() -> {
-			this.players.values().forEach(data -> data.save());
+			this.players.values().forEach(HoconPlayerData::save);
 			this.players.entrySet().stream()
-					.filter(e -> e.getValue().getLastUse() < System.currentTimeMillis() - 180000).map(e -> e.getKey())
-					.collect(Collectors.toList()).forEach(uuid -> this.players.remove(uuid));
+					.filter(e -> e.getValue().getLastUse() < System.currentTimeMillis() - 180000).map(Map.Entry::getKey)
+					.collect(Collectors.toList()).forEach(this.players::remove);
 		}).submit(mmo);
 	}
 
@@ -51,7 +51,7 @@ public class HoconPlayerDatabase implements PlayerDatabase {
 
 	@Override
 	public synchronized void unloadAll() {
-		this.players.values().forEach(data -> data.save());
+		this.players.values().forEach(HoconPlayerData::save);
 		this.players.clear();
 	}
 

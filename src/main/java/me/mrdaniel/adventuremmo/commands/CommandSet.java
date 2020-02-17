@@ -36,6 +36,7 @@ public class CommandSet extends MMOObject implements CommandExecutor {
 		data.setExp(skill, exp);
 
 		super.getMMO().getMessages().sendSet(src, user.getName(), skill, level);
+
 		return CommandResult.success();
 	}
 }

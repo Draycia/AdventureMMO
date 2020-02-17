@@ -68,7 +68,7 @@ public class AbilitiesListener extends MMOObject {
 					super.getGame().getEventManager()
 							.post(new BreakBlockEvent(super.getMMO(), p,
 									trans.getOriginal().getLocation().orElse(p.getLocation()), blockdata,
-									handdata.map(data -> data.getType()).orElse(null)));
+									handdata.map(ToolData::getType).orElse(null)));
 			});
 		});
 	}

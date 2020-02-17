@@ -7,7 +7,7 @@ public class MathUtils {
 	}
 
 	public static int between(final int value, final int min, final int max) {
-		return value < min ? min : value > max ? max : value;
+		return value < min ? min : Math.min(value, max);
 	}
 
 	public static int secondsTillTime(final long time) {

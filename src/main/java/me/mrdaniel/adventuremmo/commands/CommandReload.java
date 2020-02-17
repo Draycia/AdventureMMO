@@ -18,9 +18,10 @@ public class CommandReload extends MMOObject implements CommandExecutor {
 	}
 
 	@Override
-	public CommandResult execute(final CommandSource src, final CommandContext args) throws CommandException {
+	public CommandResult execute(final CommandSource src, final CommandContext args) {
 		super.getMMO().onReload(null);
 		super.getMMO().getMessages().sendReload(src);
+
 		return CommandResult.success();
 	}
 }

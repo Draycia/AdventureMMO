@@ -30,7 +30,7 @@ public class DoubleDropManager {
 	public DoubleDropManager(@Nonnull final AdventureMMO mmo) {
 		this.blocks = Maps.newHashMap();
 
-		Task.builder().delayTicks(10).intervalTicks(1).execute(() -> this.blocks.values().forEach(m -> m.clear()))
+		Task.builder().delayTicks(10).intervalTicks(1).execute(() -> this.blocks.values().forEach(Map::clear))
 				.submit(mmo);
 		mmo.getGame().getServer().getWorlds().forEach(w -> this.blocks.put(w, Maps.newHashMap()));
 	}

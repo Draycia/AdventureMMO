@@ -6,7 +6,7 @@ import me.mrdaniel.adventuremmo.AdventureMMO;
 
 public interface ActiveAbilityActions {
 
-	public static ActiveAbilityActions EMPTY = new ActiveAbilityActions() {
+	ActiveAbilityActions EMPTY = new ActiveAbilityActions() {
 		@Override
 		public void activate(AdventureMMO mmo, Player p) {
 		}

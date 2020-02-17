@@ -17,9 +17,11 @@ public abstract class PlayerCommand implements CommandExecutor {
 			src.sendMessage(Text.of(TextColors.RED, "This commands is for players only."));
 			return CommandResult.success();
 		}
+
 		Player p = (Player) src;
 
 		this.execute(p, args);
+
 		return CommandResult.success();
 	}
 

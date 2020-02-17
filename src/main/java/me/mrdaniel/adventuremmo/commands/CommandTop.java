@@ -18,7 +18,7 @@ public class CommandTop extends PlayerCommand {
 	}
 
 	@Override
-	public void execute(final Player p, final CommandContext args) throws CommandException {
+	public void execute(final Player p, final CommandContext args) {
 		this.mmo.getMenus().sendSkillTop(p, args.<SkillType>getOne("skill").orElse(null));
 	}
 }
