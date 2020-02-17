@@ -8,6 +8,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
+import me.mrdaniel.adventuremmo.io.playerdata.SQLPlayerDatabase;
+import me.mrdaniel.adventuremmo.io.tops.SQLTopDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Game;
@@ -152,16 +154,18 @@ public class AdventureMMO {
 
         // Initializing Managers
         // TODO: Fully implement SQL
-        // TODO: Config option to choose storage type
+        // TODO: Implement SQLite
         String storageType = config.getNode("storage").getNode("type").getString();
 
         if (storageType == null || storageType.equalsIgnoreCase("hocon")) {
             this.playerdata = new HoconPlayerDatabase(this, this.configdir.resolve("playerdata"));
             this.tops = new HoconTopDatabase(this, this.configdir.resolve("tops.conf"));
-            this.itemdata = new HoconItemDatabase(this, this.configdir.resolve("itemdata.conf"));
         } else if (storageType.equalsIgnoreCase("mysql")) {
-
+            this.playerdata = new SQLPlayerDatabase(this);
+            this.tops = new SQLTopDatabase(this);
         }
+
+        this.itemdata = new HoconItemDatabase(this, this.configdir.resolve("itemdata.conf"));
 
         this.menus = new MenuManager(this);
         this.messages = new MessageManager(this, config.getNode("messages"));
