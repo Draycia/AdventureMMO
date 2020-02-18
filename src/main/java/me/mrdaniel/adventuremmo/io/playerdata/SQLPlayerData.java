@@ -3,12 +3,18 @@ package me.mrdaniel.adventuremmo.io.playerdata;
 import javax.annotation.Nonnull;
 
 import me.mrdaniel.adventuremmo.catalogtypes.skills.SkillType;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.Player;
+
+import java.util.UUID;
 
 public class SQLPlayerData implements PlayerData {
 
+    private UUID playerUUID;
     private long last_use;
 
-    public SQLPlayerData() {
+    public SQLPlayerData(UUID playerUUID) {
+        this.playerUUID = playerUUID;
         this.last_use = System.currentTimeMillis();
     }
 
@@ -46,5 +52,15 @@ public class SQLPlayerData implements PlayerData {
     @Override
     public void save() {
         ;
+    }
+
+    @Override
+    public UUID getPlayerUUID() {
+        return playerUUID;
+    }
+
+    @Override
+    public Player getPlayer() {
+        return Sponge.getServer().getPlayer(getPlayerUUID()).get();
     }
 }

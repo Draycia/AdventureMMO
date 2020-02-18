@@ -36,7 +36,9 @@ public class AxesListener extends ActiveAbilityListener {
     public void onTarget(final PlayerDamageEntityEvent e) {
         if (e.getTool() == super.tool) {
             Entity target = e.getEntity();
-            PlayerData pdata = super.getMMO().getPlayerDatabase().addExp(super.getMMO(), e.getPlayer(), super.skill,
+            PlayerData pdata = super.getMMO().getPlayerDatabase().get(e.getPlayer().getUniqueId());
+
+            super.getMMO().getPlayerDatabase().addExp(pdata, super.skill,
                     e.isDeath() ? this.kill_exp : this.damage_exp);
 
             if (e.isDeath() && Abilities.DECAPITATE.getChance(pdata.getLevel(super.skill))) {

@@ -161,7 +161,7 @@ public class AdventureMMO {
             this.playerdata = new HoconPlayerDatabase(this, this.configdir.resolve("playerdata"));
             this.tops = new HoconTopDatabase(this, this.configdir.resolve("tops.conf"));
         } else if (storageType.equalsIgnoreCase("mysql")) {
-            this.playerdata = new SQLPlayerDatabase(this);
+            this.playerdata = new SQLPlayerDatabase(this, this.configdir.resolve("playerdata")); // TODO: check if the path is right
             this.tops = new SQLTopDatabase(this);
         }
 

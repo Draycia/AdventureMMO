@@ -142,15 +142,17 @@ public class AbilitiesListener extends MMOObject {
     @Listener(order = Order.LATE)
     @IsCancelled(value = Tristate.FALSE)
     public void onLevelUp(final LevelUpEvent e) {
-        super.getMMO().getMessages().sendLevelUp(e.getPlayer(), e.getSkill(), e.getNewLevel());
+        Player player = e.getPlayerData().getPlayer();
 
-        super.getMMO().getTops().update(e.getPlayer().getName(), e.getSkill(), e.getNewLevel());
-        super.getMMO().getTops().update(e.getPlayer().getName(), null,
-                super.getMMO().getPlayerDatabase().get(e.getPlayer().getUniqueId()).getLevels());
+        super.getMMO().getMessages().sendLevelUp(player, e.getSkill(), e.getNewLevel());
 
-        e.getPlayer().getWorld().spawnParticles(
+        super.getMMO().getTops().update(player.getName(), e.getSkill(), e.getNewLevel());
+        super.getMMO().getTops().update(player.getName(), null,
+                super.getMMO().getPlayerDatabase().get(player.getUniqueId()).getLevels());
+
+        player.getWorld().spawnParticles(
                 ParticleEffect.builder().type(ParticleTypes.HAPPY_VILLAGER).quantity(50)
                         .offset(new Vector3d(1.2, 1.2, 1.2)).build(),
-                e.getPlayer().getLocation().getPosition().add(0.0, 1.0, 0.0));
+                player.getLocation().getPosition().add(0.0, 1.0, 0.0));
     }
 }

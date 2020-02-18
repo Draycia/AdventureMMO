@@ -2,6 +2,7 @@ package me.mrdaniel.adventuremmo.event;
 
 import javax.annotation.Nonnull;
 
+import me.mrdaniel.adventuremmo.io.playerdata.PlayerData;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.cause.Cause;
@@ -13,7 +14,7 @@ import me.mrdaniel.adventuremmo.catalogtypes.skills.SkillType;
 
 public class LevelUpEvent extends AbstractEvent implements Cancellable {
 
-    private final Player player;
+    private final PlayerData player;
     private final SkillType skill;
     private final int old_level;
     private final int new_level;
@@ -21,19 +22,18 @@ public class LevelUpEvent extends AbstractEvent implements Cancellable {
     private final Cause cause;
     private boolean cancelled;
 
-    public LevelUpEvent(@Nonnull final AdventureMMO mmo, @Nonnull final Player player, @Nonnull final SkillType skill,
-            final int old_level, final int new_level) {
+    public LevelUpEvent(@Nonnull final PlayerData player, @Nonnull final SkillType skill,
+                        final int old_level, final int new_level, Cause cause) {
         this.player = player;
         this.skill = skill;
         this.old_level = old_level;
         this.new_level = new_level;
-
-        this.cause = Cause.builder().append(mmo.getContainer()).build(EventContext.empty());
+        this.cause = cause;
         this.cancelled = false;
     }
 
     @Nonnull
-    public Player getPlayer() {
+    public PlayerData getPlayerData() {
         return this.player;
     }
 

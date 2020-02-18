@@ -36,10 +36,18 @@ public class AcrobaticsListener extends MMOObject {
 
             boolean fall = e.getCause().first(DamageSource.class).map(source -> source.getType() == DamageTypes.FALL)
                     .orElse(false);
-            PlayerData data = fall
-                    ? super.getMMO().getPlayerDatabase().addExp(super.getMMO(), p, SkillTypes.ACROBATICS,
-                            (int) (this.exp_multiplier * p.get(Keys.FALL_DISTANCE).orElse(4F)))
-                    : super.getMMO().getPlayerDatabase().get(p.getUniqueId());
+
+            // TODO: isPlayerDataLoaded method
+            // Don't wait for player data to load before calculating result of event
+            // Only reduce damage if player data is already loaded
+
+            PlayerData data = super.getMMO().getPlayerDatabase().get(p.getUniqueId());
+
+            if (fall) {
+                super.getMMO().getPlayerDatabase().addExp(data, SkillTypes.ACROBATICS,
+                        (int) (this.exp_multiplier * p.get(Keys.FALL_DISTANCE).orElse(4F)));
+            }
+
             int level = data.getLevel(SkillTypes.ACROBATICS);
 
             if (fall && Abilities.ROLL.getChance(level)) {
