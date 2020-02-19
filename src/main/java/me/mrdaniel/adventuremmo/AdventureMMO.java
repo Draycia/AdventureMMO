@@ -18,6 +18,7 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
@@ -160,8 +161,8 @@ public class AdventureMMO {
         if (storageType == null || storageType.equalsIgnoreCase("hocon")) {
             this.playerdata = new HoconPlayerDatabase(this, this.configdir.resolve("playerdata"));
             this.tops = new HoconTopDatabase(this, this.configdir.resolve("tops.conf"));
-        } else if (storageType.equalsIgnoreCase("mysql")) {
-            this.playerdata = new SQLPlayerDatabase(this, this.configdir.resolve("playerdata")); // TODO: check if the path is right
+        } else if (storageType.equalsIgnoreCase("sqlite")) {
+            this.playerdata = new SQLPlayerDatabase(this, this.configdir); // TODO: check if the path is right
             this.tops = new SQLTopDatabase(this);
         }
 
