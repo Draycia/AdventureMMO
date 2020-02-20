@@ -1,13 +1,11 @@
 package me.mrdaniel.adventuremmo.io.playerdata;
 
-import javax.annotation.Nonnull;
 import javax.sql.DataSource;
 
 import me.mrdaniel.adventuremmo.catalogtypes.skills.SkillData;
 import me.mrdaniel.adventuremmo.catalogtypes.skills.SkillType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.service.sql.SqlService;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,7 +29,7 @@ public class SQLPlayerData implements PlayerData {
     }
 
     @Override
-    public int getExp(@Nonnull final SkillType skill) {
+    public int getExp(final SkillType skill) {
         this.setLastUse();
 
         SkillData data = skillData.get(skill);
@@ -44,7 +42,7 @@ public class SQLPlayerData implements PlayerData {
     }
 
     @Override
-    public void setExp(@Nonnull final SkillType skill, final int exp) {
+    public void setExp(final SkillType skill, final int exp) {
         this.setLastUse();
 
         SkillData data = skillData.get(skill);
@@ -58,7 +56,7 @@ public class SQLPlayerData implements PlayerData {
     }
 
     @Override
-    public int getLevel(@Nonnull final SkillType skill) {
+    public int getLevel(final SkillType skill) {
         this.setLastUse();
 
         SkillData data = skillData.get(skill);
@@ -71,7 +69,7 @@ public class SQLPlayerData implements PlayerData {
     }
 
     @Override
-    public void setLevel(@Nonnull final SkillType skill, final int level) {
+    public void setLevel(final SkillType skill, final int level) {
         this.setLastUse();
 
         SkillData data = skillData.get(skill);
@@ -97,11 +95,13 @@ public class SQLPlayerData implements PlayerData {
     public void save() {
         try (Connection connection = dataSource.getConnection()) {
             for (Map.Entry<SkillType, SkillData> entry : skillData.entrySet()) {
-                try (PreparedStatement statement = connection.prepareStatement("REPLACE into skill_" + entry.getKey().getId() + " (id_lsig, ld_msig, experience, level) values(?, ?, ?, ?)")) {
+                try (PreparedStatement statement = connection.prepareStatement("MERGE INTO skill_" + entry.getKey().getId() + " KEY (id_lsig, id_msig) VALUES (?, ?, ?, ?);")) {
                     statement.setLong(1, playerUUID.getLeastSignificantBits());
                     statement.setLong(2, playerUUID.getMostSignificantBits());
-                    statement.setInt(3, getExp(entry.getKey()));
-                    statement.setInt(4, getLevel(entry.getKey()));
+                    statement.setInt(3, getLevel(entry.getKey()));
+                    statement.setInt(4, getExp(entry.getKey()));
+
+                    statement.executeUpdate();
                 }
             }
         } catch (SQLException e) {

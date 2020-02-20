@@ -23,6 +23,7 @@ import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStoppingEvent;
+import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
@@ -158,12 +159,12 @@ public class AdventureMMO {
         // TODO: Implement SQLite
         String storageType = config.getNode("storage").getNode("type").getString();
 
-        if (storageType == null || storageType.equalsIgnoreCase("hocon")) {
-            this.playerdata = new HoconPlayerDatabase(this, this.configdir.resolve("playerdata"));
-            this.tops = new HoconTopDatabase(this, this.configdir.resolve("tops.conf"));
-        } else if (storageType.equalsIgnoreCase("sqlite")) {
+        if (storageType == null || storageType.equalsIgnoreCase("h2")) {
             this.playerdata = new SQLPlayerDatabase(this, this.configdir); // TODO: check if the path is right
             this.tops = new SQLTopDatabase(this);
+        } else if (storageType.equalsIgnoreCase("hocon")) {
+            this.playerdata = new HoconPlayerDatabase(this, this.configdir.resolve("playerdata"));
+            this.tops = new HoconTopDatabase(this, this.configdir.resolve("tops.conf"));
         }
 
         this.itemdata = new HoconItemDatabase(this, this.configdir.resolve("itemdata.conf"));
@@ -247,7 +248,7 @@ public class AdventureMMO {
     }
 
     @Listener
-    public void onStopping(@Nullable final GameStoppingEvent e) {
+    public void onStopping(@Nullable final GameStoppingServerEvent e) {
         this.game.getServer().getOnlinePlayers().forEach(p -> ItemUtils.restoreSuperTool(p, this.container));
         this.playerdata.unloadAll();
     }
@@ -263,6 +264,8 @@ public class AdventureMMO {
         this.game.getCommandManager().getOwnedBy(this).forEach(this.game.getCommandManager()::removeMapping);
 
         this.onInit(null);
+
+        this.game.getServer().getOnlinePlayers().forEach(p -> getPlayerDatabase().get(p.getUniqueId()));
 
         this.logger.info("Reloaded successfully.");
     }

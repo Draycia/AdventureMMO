@@ -30,7 +30,10 @@ public interface PlayerDatabase {
     Optional<PlayerData> getOffline(UUID uuid);
 
     default boolean addExp(@Nonnull final PlayerData playerData, @Nonnull final SkillType skill, final int exp) {
-        int current_level = playerData.getLevel(skill);
+        int current_level = playerData
+                .getLevel(
+                        skill);
+
         int current_exp = playerData.getExp(skill);
         int new_exp = current_exp + exp;
         int exp_till_next_level = MathUtils.expTillNextLevel(current_level);
