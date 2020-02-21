@@ -151,22 +151,22 @@ public class AdventureMMO {
         // Registering Config Settings
         Abilities.VALUES.removeIf(ability -> !config.getNode("abilities", ability.getId(), "enabled").getBoolean(true));
         Abilities.VALUES.forEach(ability -> ability.setValues(config.getNode("abilities", ability.getId())));
+
         SkillTypes.VALUES.removeIf(skill -> !config.getNode("skills", skill.getId(), "enabled").getBoolean(true));
         SkillTypes.VALUES.forEach(skill -> skill.getAbilities().removeIf(ability -> !ability.isEnabled()));
 
         // Initializing Managers
-        // TODO: Fully implement SQL
-        // TODO: Implement SQLite
         String storageType = config.getNode("storage").getNode("type").getString();
 
         if (storageType == null || storageType.equalsIgnoreCase("h2")) {
             this.playerdata = new SQLPlayerDatabase(this, this.configdir); // TODO: check if the path is right
-            this.tops = new SQLTopDatabase(this);
+            //this.tops = new SQLTopDatabase(this);
         } else if (storageType.equalsIgnoreCase("hocon")) {
             this.playerdata = new HoconPlayerDatabase(this, this.configdir.resolve("playerdata"));
-            this.tops = new HoconTopDatabase(this, this.configdir.resolve("tops.conf"));
+            //this.tops = new HoconTopDatabase(this, this.configdir.resolve("tops.conf"));
         }
 
+        this.tops = new HoconTopDatabase(this, this.configdir.resolve("tops.conf"));
         this.itemdata = new HoconItemDatabase(this, this.configdir.resolve("itemdata.conf"));
 
         this.menus = new MenuManager(this);
