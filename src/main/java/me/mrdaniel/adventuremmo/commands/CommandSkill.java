@@ -20,7 +20,7 @@ public class CommandSkill extends PlayerCommand {
     }
 
     @Override
-    public void execute(final Player p, final CommandContext args) {
-        this.mmo.getMenus().sendSkillInfo(p, this.skill);
+    public void execute(final Player player, final CommandContext args) {
+        this.mmo.getMenus().sendSkillInfo(player, this.skill);
     }
 }

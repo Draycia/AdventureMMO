@@ -24,17 +24,17 @@ public class CommandItemClear extends PlayerCommand {
     }
 
     @Override
-    public void execute(final Player p, final CommandContext args) {
-        Optional<ItemStack> hand = p.getItemInHand(HandTypes.MAIN_HAND);
+    public void execute(final Player player, final CommandContext args) {
+        Optional<ItemStack> hand = player.getItemInHand(HandTypes.MAIN_HAND);
 
         if (!hand.isPresent()) {
-            p.sendMessage(Text.of(TextColors.RED, "You must be holding an item to use this command"));
+            player.sendMessage(Text.of(TextColors.RED, "You must be holding an item to use this command"));
             return;
         }
 
         ItemType item = hand.get().getType();
 
         this.mmo.getItemDatabase().remove(item);
-        this.mmo.getMessages().sendItemClear(p, item);
+        this.mmo.getMessages().sendItemClear(player, item);
     }
 }

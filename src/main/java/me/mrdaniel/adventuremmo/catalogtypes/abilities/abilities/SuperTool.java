@@ -23,7 +23,7 @@ public class SuperTool implements ActiveAbilityActions {
     }
 
     @Override
-    public void deactivate(@Nonnull final AdventureMMO mmo, final Player p) {
-        ItemUtils.restoreSuperTool(p, mmo.getContainer());
+    public void deactivate(@Nonnull final AdventureMMO mmo, final Player player) {
+        ItemUtils.restoreSuperTool(player, mmo.getContainer());
     }
 }

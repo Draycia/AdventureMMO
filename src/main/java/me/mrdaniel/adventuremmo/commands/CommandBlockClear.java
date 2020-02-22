@@ -25,17 +25,17 @@ public class CommandBlockClear extends PlayerCommand {
     }
 
     @Override
-    public void execute(final Player p, final CommandContext args) {
-        Optional<Location<World>> loc = ServerUtils.getFirstBlock(p);
+    public void execute(final Player player, final CommandContext args) {
+        Optional<Location<World>> loc = ServerUtils.getFirstBlock(player);
 
         if (!loc.isPresent()) {
-            p.sendMessage(Text.of(TextColors.RED, "You must be looking at a block."));
+            player.sendMessage(Text.of(TextColors.RED, "You must be looking at a block."));
             return;
         }
 
         BlockType block = loc.get().getBlockType();
 
         this.mmo.getItemDatabase().remove(block);
-        this.mmo.getMessages().sendBlockClear(p, block);
+        this.mmo.getMessages().sendBlockClear(player, block);
     }
 }

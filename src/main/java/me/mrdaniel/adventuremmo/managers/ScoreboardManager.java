@@ -32,26 +32,26 @@ public class ScoreboardManager extends MMOObject {
         this.tasks = Maps.newHashMap();
     }
 
-    public void setTemp(@Nonnull final Player p, @Nonnull final Text title,
+    public void setTemp(@Nonnull final Player player, @Nonnull final Text title,
             @Nonnull final Multimap<Integer, Text> lines) {
-        this.unload(p);
+        this.unload(player);
 
-        this.set(p, title, lines);
+        this.set(player, title, lines);
 
-        this.tasks.put(p.getUniqueId(),
-                Task.builder().delayTicks(300).execute(() -> this.unload(p)).submit(super.getMMO()));
+        this.tasks.put(player.getUniqueId(),
+                Task.builder().delayTicks(300).execute(() -> this.unload(player)).submit(super.getMMO()));
     }
 
-    public void setRepeating(@Nonnull final Player p, @Nonnull final Text title,
+    public void setRepeating(@Nonnull final Player player, @Nonnull final Text title,
             @Nonnull final Function<PlayerData, Multimap<Integer, Text>> function) {
-        this.unload(p);
+        this.unload(player);
 
-        this.tasks.put(p.getUniqueId(), Task.builder().delayTicks(0).intervalTicks(100).execute(t -> {
-            this.set(p, title, function.apply(super.getMMO().getPlayerDatabase().get(p.getUniqueId())));
+        this.tasks.put(player.getUniqueId(), Task.builder().delayTicks(0).intervalTicks(100).execute(() -> {
+            this.set(player, title, function.apply(super.getMMO().getPlayerDatabase().get(player.getUniqueId())));
         }).submit(super.getMMO()));
     }
 
-    private void set(@Nonnull final Player p, @Nonnull final Text title, @Nonnull final Multimap<Integer, Text> lines) {
+    private void set(@Nonnull final Player player, @Nonnull final Text title, @Nonnull final Multimap<Integer, Text> lines) {
         Scoreboard board = Scoreboard.builder().build();
         // Objective obj = Objective.builder().name("MMO_" + (p.getName().length() > 12
         // ? p.getName().substring(0, 12) :
@@ -60,15 +60,15 @@ public class ScoreboardManager extends MMOObject {
         lines.asMap().forEach((line, txts) -> txts.forEach(txt -> obj.getOrCreateScore(txt).setScore(line)));
 
         board.addObjective(obj);
-        p.setScoreboard(board);
+        player.setScoreboard(board);
         board.updateDisplaySlot(obj, DisplaySlots.SIDEBAR);
     }
 
-    public void unload(@Nonnull final Player p) {
-        Optional.ofNullable(this.tasks.get(p.getUniqueId())).ifPresent(t -> {
-            t.cancel();
-            this.tasks.remove(p.getUniqueId());
+    public void unload(@Nonnull final Player player) {
+        Optional.ofNullable(this.tasks.get(player.getUniqueId())).ifPresent(task -> {
+            task.cancel();
+            this.tasks.remove(player.getUniqueId());
         });
-        p.getScoreboard().clearSlot(DisplaySlots.SIDEBAR);
+        player.getScoreboard().clearSlot(DisplaySlots.SIDEBAR);
     }
 }

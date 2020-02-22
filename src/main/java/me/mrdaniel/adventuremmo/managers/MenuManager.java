@@ -3,6 +3,7 @@ package me.mrdaniel.adventuremmo.managers;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -23,10 +24,12 @@ import me.mrdaniel.adventuremmo.utils.TextUtils;
 
 public class MenuManager {
 
+    private final AdventureMMO mmo;
     private final ScoreboardManager scoreboards;
     private int i;
 
     public MenuManager(@Nonnull final AdventureMMO mmo) {
+        this.mmo = mmo;
         this.scoreboards = new ScoreboardManager(mmo);
         this.i = 0;
     }
@@ -66,86 +69,93 @@ public class MenuManager {
         }
     }
 
-    public void sendSkillInfo(@Nonnull final Player p, @Nonnull final SkillType skill) {
-        PlayerData pdata = this.scoreboards.getMMO().getPlayerDatabase().get(p.getUniqueId());
-        MMOData sdata = p.get(MMOData.class).orElse(new MMOData());
+    public void sendSkillInfo(@Nonnull final Player player, @Nonnull final SkillType skill) {
+        PlayerData pdata = this.scoreboards.getMMO().getPlayerDatabase().get(player.getUniqueId());
+        MMOData sdata = player.get(MMOData.class).orElse(new MMOData());
 
         if (sdata.getScoreboard()) {
             if (sdata.getScoreboardPermanent()) {
-                this.scoreboards.setRepeating(p, this.getTitle(skill.getName(), true),
+                this.scoreboards.setRepeating(player, this.getTitle(skill.getName(), true),
                         data -> this.getSkillInfoLines(data, skill));
             } else {
-                this.scoreboards.setTemp(p, this.getTitle(skill.getName(), true), this.getSkillInfoLines(pdata, skill));
+                this.scoreboards.setTemp(player, this.getTitle(skill.getName(), true), this.getSkillInfoLines(pdata, skill));
             }
         } else {
-            p.sendMessage(Text.EMPTY);
-            p.sendMessage(this.getTitle(skill.getName(), false));
-            p.sendMessage(Text.of(TextColors.GREEN, "Level: ", pdata.getLevel(skill)));
-            p.sendMessage(Text.of(TextColors.GREEN, "EXP: ", pdata.getExp(skill), " / ",
+            player.sendMessage(Text.EMPTY);
+            player.sendMessage(this.getTitle(skill.getName(), false));
+            player.sendMessage(Text.of(TextColors.GREEN, "Level: ", pdata.getLevel(skill)));
+            player.sendMessage(Text.of(TextColors.GREEN, "EXP: ", pdata.getExp(skill), " / ",
                     MathUtils.expTillNextLevel(pdata.getLevel(skill))));
             skill.getAbilities().forEach(ability -> {
-                p.sendMessage(Text.EMPTY);
-                p.sendMessage(this.getBoardTitle(ability.getName(), false));
-                p.sendMessage(ability.getValueLine(pdata.getLevel(skill)));
+                player.sendMessage(Text.EMPTY);
+                player.sendMessage(this.getBoardTitle(ability.getName(), false));
+                player.sendMessage(ability.getValueLine(pdata.getLevel(skill)));
             });
-            p.sendMessage(Text.EMPTY);
+            player.sendMessage(Text.EMPTY);
         }
     }
 
-    public void sendSkillTop(@Nonnull final Player p, @Nullable final SkillType type) {
-        MMOData sdata = p.get(MMOData.class).orElse(new MMOData());
-        String title = (type == null) ? "Total Top" : (type.getName() + " Top");
+    public void sendSkillTop(@Nonnull final Player player, @Nullable final SkillType type) {
+        Sponge.getScheduler().createTaskBuilder()
+                .execute(() -> {
+                    MMOData sdata = player.get(MMOData.class).orElse(new MMOData());
+                    String title = (type == null) ? "Total Top" : (type.getName() + " Top");
 
-        if (sdata.getScoreboard()) {
-            if (sdata.getScoreboardPermanent()) {
-                this.scoreboards.setRepeating(p, this.getTitle(title, true), data -> this.getSkillTopLines(type));
-            } else {
-                this.scoreboards.setTemp(p, this.getTitle(title, true), this.getSkillTopLines(type));
-            }
-        } else {
-            p.sendMessage(Text.EMPTY);
-            p.sendMessage(this.getTitle(title, false));
-            this.scoreboards.getMMO().getTops().getTop(type)
-                    .forEach((number, player) -> p
-                            .sendMessage(Text.of(TextColors.RED, number, ": ", TextColors.AQUA, player.getFirst(),
-                                    TextColors.GRAY, " - ", TextColors.GREEN, "Level ", player.getSecond())));
-            p.sendMessage(Text.EMPTY);
-        }
+                    if (sdata.getScoreboard()) {
+                        if (sdata.getScoreboardPermanent()) {
+                            this.scoreboards.setRepeating(player, this.getTitle(title, true), data -> this.getSkillTopLines(type));
+                        } else {
+                            this.scoreboards.setTemp(player, this.getTitle(title, true), this.getSkillTopLines(type));
+                        }
+                    } else {
+                        player.sendMessage(Text.EMPTY);
+                        player.sendMessage(this.getTitle(title, false));
+                        this.scoreboards.getMMO().getTops().getTop(type)
+                                .forEach((number, topPlayer) -> player
+                                        .sendMessage(Text.of(TextColors.RED, number, ": ", TextColors.AQUA, topPlayer.getFirst(),
+                                                TextColors.GRAY, " - ", TextColors.GREEN, "Level ", topPlayer.getSecond())));
+                        player.sendMessage(Text.EMPTY);
+                    }
+                }).async().submit(mmo);
     }
 
-    public void sendSettingsInfo(@Nonnull final Player p) {
-        MMOData data = p.get(MMOData.class).orElse(new MMOData());
+    public void sendSettingsInfo(@Nonnull final Player player) {
+        MMOData data = player.get(MMOData.class).orElse(new MMOData());
 
-        p.sendMessage(Text.EMPTY);
-        p.sendMessage(this.getTitle("Settings", false));
-        p.sendMessage(Text.builder()
+        player.sendMessage(Text.EMPTY);
+        player.sendMessage(this.getTitle("Settings", false));
+
+        player.sendMessage(Text.builder()
                 .append(Text.of(TextColors.AQUA, "Action Bar: ", TextUtils.getValueText(data.getActionBar())))
                 .onHover(TextActions.showText(TextUtils.getToggleText(data.getActionBar())))
                 .onClick(TextActions.executeCallback(src -> {
                     data.setActionBar(!data.getActionBar());
-                    p.offer(data);
+                    player.offer(data);
                     this.sendSettingsInfo((Player) src);
                 })).build());
-        p.sendMessage(Text.builder()
+
+        player.sendMessage(Text.builder()
                 .append(Text.of(TextColors.AQUA, "Scoreboard: ", TextUtils.getValueText(data.getScoreboard())))
                 .onHover(TextActions.showText(TextUtils.getToggleText(data.getScoreboard())))
                 .onClick(TextActions.executeCallback(src -> {
                     data.setScoreboard(!data.getScoreboard());
-                    p.offer(data);
+                    player.offer(data);
                     this.sendSettingsInfo((Player) src);
-                    this.scoreboards.unload(p);
+                    this.scoreboards.unload(player);
                 })).build());
-        p.sendMessage(Text.builder()
+
+        player.sendMessage(Text.builder()
                 .append(Text.of(TextColors.AQUA, "Scoreboard Permanent: ",
                         TextUtils.getValueText(data.getScoreboardPermanent())))
                 .onHover(TextActions.showText(TextUtils.getToggleText(data.getScoreboardPermanent())))
                 .onClick(TextActions.executeCallback(src -> {
                     data.setScoreboardPermanent(!data.getScoreboardPermanent());
-                    p.offer(data);
+                    player.offer(data);
                     this.sendSettingsInfo((Player) src);
-                    this.scoreboards.unload(p);
+                    this.scoreboards.unload(player);
                 })).build());
-        p.sendMessage(Text.EMPTY);
+
+        player.sendMessage(Text.EMPTY);
     }
 
     @Nonnull
