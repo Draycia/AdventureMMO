@@ -53,7 +53,7 @@ public class MMOKeys {
             .query(DataQuery.of("scoreboard_permanent"))
             .id("scoreboard_permanent")
             .name("Scoreboard Permanent")
-            .build();;
+            .build();
 
     // SuperToolData
     public static final Key<ListValue<Enchantment>> ENCHANTS = Key.builder()

@@ -82,8 +82,8 @@ public class ItemUtils {
                 .add(Keys.REPRESENTED_PLAYER, player.getProfile()).build();
     }
 
-    public static void giveSuperTool(@Nonnull final Player player, @Nonnull final ToolType tool) {
-        ItemStack item = player.getItemInHand(HandTypes.MAIN_HAND).get();
+    public static void giveSuperTool(@Nonnull final Player p, @Nonnull final ToolType tool) {
+        ItemStack item = p.getItemInHand(HandTypes.MAIN_HAND).get();
 
         item.offer(new SuperToolData(item.get(Keys.ITEM_ENCHANTMENTS).orElse(Lists.newArrayList()),
                 TextUtils.toString(item.get(Keys.DISPLAY_NAME).orElse(Text.of(""))),
@@ -107,7 +107,7 @@ public class ItemUtils {
         ench.add(Enchantment.of(type, MathUtils.between(lvl, 1, max_lvl)));
         item.offer(Keys.ITEM_ENCHANTMENTS, ench);
 
-        player.setItemInHand(HandTypes.MAIN_HAND, item);
+        p.setItemInHand(HandTypes.MAIN_HAND, item);
     }
 
     public static void restoreSuperTool(@Nonnull final Player player, @Nonnull final PluginContainer container) {

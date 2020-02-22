@@ -2,7 +2,6 @@ package me.mrdaniel.adventuremmo.commands;
 
 import javax.annotation.Nonnull;
 
-import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.entity.living.player.Player;
 

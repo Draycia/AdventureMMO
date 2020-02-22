@@ -2,15 +2,10 @@ package me.mrdaniel.adventuremmo.io.playerdata;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 
 import javax.annotation.Nonnull;
 
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
 
 import me.mrdaniel.adventuremmo.AdventureMMO;
 import me.mrdaniel.adventuremmo.catalogtypes.skills.SkillType;
@@ -29,7 +24,7 @@ public interface PlayerDatabase {
 
     Optional<PlayerData> getOffline(UUID uuid);
 
-    default boolean addExp(@Nonnull final PlayerData playerData, @Nonnull final SkillType skill, final int exp) {
+    default void addExp(@Nonnull final PlayerData playerData, @Nonnull final SkillType skill, final int exp) {
         int current_level = playerData
                 .getLevel(
                         skill);
@@ -53,7 +48,5 @@ public interface PlayerDatabase {
 
         // TODO: EXPGainEvent
         playerData.setExp(skill, new_exp);
-
-        return true;
     }
 }

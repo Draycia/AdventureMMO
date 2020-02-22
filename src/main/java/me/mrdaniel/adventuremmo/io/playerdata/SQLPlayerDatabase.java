@@ -3,14 +3,9 @@ package me.mrdaniel.adventuremmo.io.playerdata;
 import me.mrdaniel.adventuremmo.AdventureMMO;
 import me.mrdaniel.adventuremmo.catalogtypes.skills.SkillType;
 import me.mrdaniel.adventuremmo.catalogtypes.skills.SkillTypes;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.service.sql.SqlService;
 
 import javax.annotation.Nonnull;
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -89,21 +84,6 @@ public class SQLPlayerDatabase implements PlayerDatabase {
 
             return null;
         });
-    }
-
-    private void initialUserSave(PlayerData data) {
-        try (Connection connection = dataSource.getConnection()) {
-            for (SkillType skillType : SkillTypes.VALUES) {
-                try (PreparedStatement statement = connection.prepareStatement("INSERT INTO skill_" + skillType.getId() + " VALUES (0, 0, ?, ?)")) {
-                    statement.setLong(1, data.getPlayerUUID().getLeastSignificantBits());
-                    statement.setLong(2, data.getPlayerUUID().getMostSignificantBits());
-
-                    statement.executeUpdate();
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

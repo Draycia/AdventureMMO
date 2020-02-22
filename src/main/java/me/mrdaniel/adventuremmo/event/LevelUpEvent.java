@@ -3,13 +3,10 @@ package me.mrdaniel.adventuremmo.event;
 import javax.annotation.Nonnull;
 
 import me.mrdaniel.adventuremmo.io.playerdata.PlayerData;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.impl.AbstractEvent;
 
-import me.mrdaniel.adventuremmo.AdventureMMO;
 import me.mrdaniel.adventuremmo.catalogtypes.skills.SkillType;
 
 public class LevelUpEvent extends AbstractEvent implements Cancellable {
