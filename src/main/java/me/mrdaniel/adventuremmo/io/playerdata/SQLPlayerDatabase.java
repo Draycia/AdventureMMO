@@ -24,46 +24,14 @@ public class SQLPlayerDatabase implements PlayerDatabase {
 
     private AdventureMMO plugin;
     private ConcurrentHashMap<UUID, SQLPlayerData> players;
-    private String uri;
-    private SqlService sqlService;
+    private DataSource dataSource;
 
-    public SQLPlayerDatabase(@Nonnull final AdventureMMO mmo, @Nonnull final Path path) {
+    public SQLPlayerDatabase(@Nonnull final AdventureMMO mmo, @Nonnull final DataSource dataSource) {
         this.plugin = mmo;
-
-        Path dbFile = path.resolve("storage.db");
-
-        if (!Files.exists(dbFile)) {
-            try {
-                Files.createFile(dbFile);
-            } catch (final IOException exc) {
-                mmo.getLogger().error("Failed to create database file from asset: {}", exc);
-                return;
-            }
-        }
-
-        Optional<SqlService> sql = Sponge.getServiceManager().provide(SqlService.class);
-
-        if (!sql.isPresent()) {
-            mmo.getLogger().error("Failed to initialize database file");
-            return;
-        } else {
-            this.uri = "jdbc:h2:" + dbFile.toAbsolutePath().toString();
-            this.sqlService = sql.get();
-
-            setupTables();
-        }
-
+        this.dataSource = dataSource;
         this.players = new ConcurrentHashMap<>();
-    }
 
-    public DataSource getDataSource() {
-        try {
-            return sqlService.getDataSource(uri);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        setupTables();
     }
 
     @Override
@@ -84,9 +52,9 @@ public class SQLPlayerDatabase implements PlayerDatabase {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
-                SQLPlayerData playerData = new SQLPlayerData(uuid, getDataSource());
+                SQLPlayerData playerData = new SQLPlayerData(uuid, dataSource);
 
-                try (Connection connection = getDataSource().getConnection()) {
+                try (Connection connection = dataSource.getConnection()) {
                     for (SkillType skillType : SkillTypes.VALUES) {
                         try (PreparedStatement statement = connection.prepareStatement("SELECT level, experience FROM skill_" + skillType.getId() + " WHERE id_lsig = ? AND id_msig = ?;")) {
                             statement.setLong(1, uuid.getLeastSignificantBits());
@@ -124,7 +92,7 @@ public class SQLPlayerDatabase implements PlayerDatabase {
     }
 
     private void initialUserSave(PlayerData data) {
-        try (Connection connection = getDataSource().getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             for (SkillType skillType : SkillTypes.VALUES) {
                 try (PreparedStatement statement = connection.prepareStatement("INSERT INTO skill_" + skillType.getId() + " VALUES (0, 0, ?, ?)")) {
                     statement.setLong(1, data.getPlayerUUID().getLeastSignificantBits());
@@ -149,7 +117,7 @@ public class SQLPlayerDatabase implements PlayerDatabase {
         // future
         loadDataAsync(uuid);
 
-        return new DummySqlPlayerData(uuid, getDataSource());
+        return new DummySqlPlayerData(uuid, dataSource);
     }
 
     @Override
@@ -165,7 +133,7 @@ public class SQLPlayerDatabase implements PlayerDatabase {
     }
 
     private void setupTables() {
-        try (Connection connection = getDataSource().getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             for (SkillType skillType : SkillTypes.VALUES) {
                 try (PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS skill_" + skillType.getId() + " (id_lsig bigint NOT NULL, id_msig bigint NOT NULL, level integer NOT NULL, experience integer NOT NULL, PRIMARY KEY (id_lsig, id_msig));")) {
                     statement.execute();

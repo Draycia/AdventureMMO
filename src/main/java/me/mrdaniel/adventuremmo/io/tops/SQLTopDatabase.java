@@ -4,12 +4,17 @@ import me.mrdaniel.adventuremmo.AdventureMMO;
 import me.mrdaniel.adventuremmo.catalogtypes.skills.SkillType;
 import org.spongepowered.api.util.Tuple;
 
+import javax.sql.DataSource;
 import java.util.Map;
 
 public class SQLTopDatabase implements TopDatabase {
 
-    public SQLTopDatabase(AdventureMMO mmo) {
+    private AdventureMMO mmo;
+    private DataSource dataSource;
 
+    public SQLTopDatabase(AdventureMMO mmo, DataSource dataSource) {
+        this.mmo = mmo;
+        this.dataSource = dataSource;
     }
 
     @Override

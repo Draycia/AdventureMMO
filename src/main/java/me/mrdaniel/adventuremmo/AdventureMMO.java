@@ -3,16 +3,20 @@ package me.mrdaniel.adventuremmo;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
+import java.util.Optional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.sql.DataSource;
 
 import me.mrdaniel.adventuremmo.io.playerdata.SQLPlayerDatabase;
 import me.mrdaniel.adventuremmo.io.tops.SQLTopDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
@@ -27,6 +31,7 @@ import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.service.sql.SqlService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -159,14 +164,39 @@ public class AdventureMMO {
         String storageType = config.getNode("storage").getNode("type").getString();
 
         if (storageType == null || storageType.equalsIgnoreCase("h2")) {
-            this.playerdata = new SQLPlayerDatabase(this, this.configdir); // TODO: check if the path is right
-            //this.tops = new SQLTopDatabase(this);
+            Path dbFile = this.configdir.resolve("storage.db");
+
+            if (!Files.exists(dbFile)) {
+                try {
+                    Files.createFile(dbFile);
+                } catch (final IOException exc) {
+                    getLogger().error("Failed to create database file from asset: {}", exc);
+                    return;
+                }
+            }
+
+            Optional<SqlService> sql = Sponge.getServiceManager().provide(SqlService.class);
+
+            if (!sql.isPresent()) {
+                this.playerdata = new HoconPlayerDatabase(this, this.configdir.resolve("playerdata"));
+                this.tops = new HoconTopDatabase(this, this.configdir.resolve("tops.conf"));
+            } else {
+                String uri = "jdbc:h2:" + dbFile.toAbsolutePath().toString();
+                try {
+                    DataSource dataSource = sql.get().getDataSource(uri);
+
+                    this.playerdata = new SQLPlayerDatabase(this, dataSource);
+                    this.tops = new SQLTopDatabase(this, dataSource);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
         } else if (storageType.equalsIgnoreCase("hocon")) {
             this.playerdata = new HoconPlayerDatabase(this, this.configdir.resolve("playerdata"));
-            //this.tops = new HoconTopDatabase(this, this.configdir.resolve("tops.conf"));
+            this.tops = new HoconTopDatabase(this, this.configdir.resolve("tops.conf"));
         }
 
-        this.tops = new HoconTopDatabase(this, this.configdir.resolve("tops.conf"));
         this.itemdata = new HoconItemDatabase(this, this.configdir.resolve("itemdata.conf"));
 
         this.menus = new MenuManager(this);
