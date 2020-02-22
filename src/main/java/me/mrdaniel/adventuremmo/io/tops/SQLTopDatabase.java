@@ -39,11 +39,11 @@ public class SQLTopDatabase implements TopDatabase {
         int i = 1;
 
         try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement("`SELECT * from skill_ " + skill.getId() + " ORDER BY level, experience DESC LIMIT 10`")) {
+            try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM skill_" + skill.getId() + " ORDER BY level, experience DESC LIMIT 10")) {
                 ResultSet resultSet = statement.executeQuery();
 
                 while (resultSet.next()) {
-                    UUID uuid = new UUID(resultSet.getLong(1), resultSet.getLong(2));
+                    UUID uuid = new UUID(resultSet.getLong(2), resultSet.getLong(1));
                     String name = storage.get(uuid).get().getName();
 
                     top.put(i++, new Tuple<>(name, resultSet.getInt(3)));
