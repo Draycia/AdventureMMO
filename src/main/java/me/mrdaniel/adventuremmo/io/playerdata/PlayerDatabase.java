@@ -39,12 +39,8 @@ public interface PlayerDatabase {
         int exp_till_next_level = MathUtils.expTillNextLevel(current_level);
 
         if (new_exp >= exp_till_next_level) {
-            if (!Sponge.getGame().getEventManager().post(new LevelUpEvent(
-                            playerData,
-                            skill,
-                            current_level,
-                            current_level + 1,
-                            Sponge.getCauseStackManager().getCurrentCause()))) {
+            if (!Sponge.getGame().getEventManager().post(new LevelUpEvent(playerData, skill, current_level,
+                    current_level + 1))) {
 
                 playerData.setLevel(skill, current_level + 1);
                 new_exp -= exp_till_next_level;

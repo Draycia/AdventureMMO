@@ -12,7 +12,7 @@ public class DummySqlPlayerData extends SQLPlayerData {
     private UUID playerUUID;
 
     public DummySqlPlayerData(UUID playerUUID, DataSource dataSource) {
-        super(playerUUID, dataSource);
+        super(playerUUID, dataSource, false);
 
         this.playerUUID = playerUUID;
     }

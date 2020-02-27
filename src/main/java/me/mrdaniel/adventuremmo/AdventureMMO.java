@@ -281,7 +281,7 @@ public class AdventureMMO {
         try {
             DataSource dataSource = sql.getDataSource(uri);
 
-            this.playerdata = new SQLPlayerDatabase(this, dataSource);
+            this.playerdata = new SQLPlayerDatabase(this, dataSource, false);
             this.tops = new SQLTopDatabase(this, dataSource);
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -305,7 +305,7 @@ public class AdventureMMO {
             try {
                 DataSource dataSource = sql.getDataSource(uri);
 
-                this.playerdata = new SQLPlayerDatabase(this, dataSource);
+                this.playerdata = new SQLPlayerDatabase(this, dataSource, true);
                 this.tops = new SQLTopDatabase(this, dataSource);
             } catch (SQLException ex) {
                 ex.printStackTrace();

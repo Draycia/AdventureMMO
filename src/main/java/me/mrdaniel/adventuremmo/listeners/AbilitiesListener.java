@@ -66,9 +66,8 @@ public class AbilitiesListener extends MMOObject {
             super.getMMO().getItemDatabase().getData(trans.getOriginal().getState().getType()).ifPresent(blockdata -> {
                 if (!trans.getOriginal().getCreator().isPresent())
                     super.getGame().getEventManager()
-                            .post(new BreakBlockEvent(super.getMMO(), p,
-                                    trans.getOriginal().getLocation().orElse(p.getLocation()), blockdata,
-                                    handdata.map(ToolData::getType).orElse(null)));
+                            .post(new BreakBlockEvent(p, trans.getOriginal().getLocation().orElse(p.getLocation()),
+                                    blockdata, handdata.map(ToolData::getType).orElse(null)));
             });
         });
     }
@@ -79,7 +78,7 @@ public class AbilitiesListener extends MMOObject {
         if (source.getSource() instanceof Player) {
             Player p = (Player) source.getSource();
             super.getMMO().getItemDatabase().getData(p.getItemInHand(HandTypes.MAIN_HAND).orElse(null)).ifPresent(
-                    handdata -> super.getGame().getEventManager().post(new PlayerDamageEntityEvent(super.getMMO(), p,
+                    handdata -> super.getGame().getEventManager().post(new PlayerDamageEntityEvent(p,
                             e.getTargetEntity(), handdata.getType(), e.getFinalDamage(), e.willCauseDeath())));
         }
     }
@@ -93,21 +92,25 @@ public class AbilitiesListener extends MMOObject {
 
         Optional<ToolData> handdata = super.getMMO().getItemDatabase()
                 .getData(p.getItemInHand(HandTypes.MAIN_HAND).orElse(null));
+
         if (!handdata.isPresent()) {
             return;
         }
+
         ToolType tool = handdata.get().getType();
 
-        AbilityEvent ae = new AbilityEvent(super.getMMO(), p, tool,
-                e.getTargetBlock().getState().getType() != BlockTypes.AIR);
+        AbilityEvent ae = new AbilityEvent(p, tool, e.getTargetBlock().getState().getType() != BlockTypes.AIR);
         super.getGame().getEventManager().post(ae);
+
         if (ae.isCancelled() || ae.getAbility() == null || ae.getSkill() == null) {
             return;
         }
+
         ActiveAbility ability = ae.getAbility();
         SkillType skill = ae.getSkill();
 
         MMOData data = p.get(MMOData.class).orElse(new MMOData());
+
         if (data.isDelayActive(ability.getId())) {
             super.getMMO().getMessages().sendAbilityRecharge(p,
                     MathUtils.secondsTillTime(data.getDelay(ability.getId())));

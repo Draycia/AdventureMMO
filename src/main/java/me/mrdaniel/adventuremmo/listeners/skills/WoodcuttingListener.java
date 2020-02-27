@@ -56,10 +56,12 @@ public class WoodcuttingListener extends ActiveAbilityListener {
                                                 this.matchTree(
                                                         newloc.getBlock().get(Keys.TREE_TYPE).orElse(TreeTypes.OAK)))
                                                 .createSnapshot();
+
                                         newloc.setBlockType(BlockTypes.AIR, BlockChangeFlags.ALL);
                                         ItemUtils.drop(newloc, item);
-                                        super.getGame().getEventManager().post(new BreakBlockEvent(super.getMMO(),
-                                                e.getPlayer(), newloc, blockdata, this.tool));
+
+                                        super.getGame().getEventManager().post(new BreakBlockEvent(e.getPlayer(),
+                                                newloc, blockdata, this.tool));
                                     }
                                 });
                             });
