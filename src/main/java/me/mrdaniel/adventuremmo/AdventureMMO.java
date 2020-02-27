@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 
 import me.mrdaniel.adventuremmo.io.playerdata.SQLPlayerDatabase;
 import me.mrdaniel.adventuremmo.io.tops.SQLTopDatabase;
+import ninja.leaping.configurate.ConfigurationNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Game;
@@ -142,13 +143,23 @@ public class AdventureMMO {
         this.logger.info("Loading plugin...");
 
         // Register Data
-        DataRegistration.builder().dataClass(MMOData.class).immutableClass(ImmutableMMOData.class)
-                .builder(new MMODataBuilder()).manipulatorId("data").dataName("Data").buildAndRegister(container);
-        DataRegistration.builder().dataClass(SuperToolData.class).immutableClass(ImmutableSuperToolData.class)
-                .builder(new SuperToolDataBuilder()).manipulatorId("super-tool-data").dataName("Super Tool Data")
+        DataRegistration.builder()
+                .dataClass(MMOData.class)
+                .immutableClass(ImmutableMMOData.class)
+                .builder(new MMODataBuilder())
+                .manipulatorId("data")
+                .dataName("Data")
                 .buildAndRegister(container);
 
-        final long startuptime = System.currentTimeMillis();
+        DataRegistration.builder()
+                .dataClass(SuperToolData.class)
+                .immutableClass(ImmutableSuperToolData.class)
+                .builder(new SuperToolDataBuilder())
+                .manipulatorId("super-tool-data")
+                .dataName("Super Tool Data")
+                .buildAndRegister(container);
+
+        final long startupTime = System.currentTimeMillis();
 
         // Loading Config
         final Config config = new Config(this, this.configdir.resolve("config.conf"));
@@ -164,37 +175,11 @@ public class AdventureMMO {
         String storageType = config.getNode("storage").getNode("type").getString();
 
         if (storageType == null || storageType.equalsIgnoreCase("h2")) {
-            Path dbFile = this.configdir.resolve("storage.db");
-
-            if (!Files.exists(dbFile)) {
-                try {
-                    Files.createFile(dbFile);
-                } catch (final IOException exc) {
-                    getLogger().error("Failed to create database file from asset: {}", exc);
-                    return;
-                }
-            }
-
-            Optional<SqlService> sql = Sponge.getServiceManager().provide(SqlService.class);
-
-            if (!sql.isPresent()) {
-                this.playerdata = new HoconPlayerDatabase(this, this.configdir.resolve("playerdata"));
-                this.tops = new HoconTopDatabase(this, this.configdir.resolve("tops.conf"));
-            } else {
-                String uri = "jdbc:h2:" + dbFile.toAbsolutePath().toString();
-                try {
-                    DataSource dataSource = sql.get().getDataSource(uri);
-
-                    this.playerdata = new SQLPlayerDatabase(this, dataSource);
-                    this.tops = new SQLTopDatabase(this, dataSource);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-
+            setupH2();
+        } else if (storageType.equalsIgnoreCase("mysql")) {
+            setupMySQL(config);
         } else if (storageType.equalsIgnoreCase("hocon")) {
-            this.playerdata = new HoconPlayerDatabase(this, this.configdir.resolve("playerdata"));
-            this.tops = new HoconTopDatabase(this, this.configdir.resolve("tops.conf"));
+            setupHocon();
         }
 
         this.itemdata = new HoconItemDatabase(this, this.configdir.resolve("itemdata.conf"));
@@ -274,7 +259,63 @@ public class AdventureMMO {
                 this.logger.error("No Economy Service was found! Install one or disable economy in the config file: {}", exc);
             }
         }
-        this.logger.info("Loaded plugin successfully in {} milliseconds.", System.currentTimeMillis() - startuptime);
+        this.logger.info("Loaded plugin successfully in {} milliseconds.", System.currentTimeMillis() - startupTime);
+    }
+
+    private void setupH2() {
+        Path dbFile = this.configdir.resolve("storage.db");
+
+        if (!Files.exists(dbFile)) {
+            try {
+                Files.createFile(dbFile);
+            } catch (final IOException exc) {
+                getLogger().error("Failed to create database file from asset: {}", exc);
+                return;
+            }
+        }
+
+        SqlService sql = Sponge.getServiceManager().provide(SqlService.class).get();
+
+        String uri = "jdbc:h2:" + dbFile.toAbsolutePath().toString();
+
+        try {
+            DataSource dataSource = sql.getDataSource(uri);
+
+            this.playerdata = new SQLPlayerDatabase(this, dataSource);
+            this.tops = new SQLTopDatabase(this, dataSource);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void setupMySQL(Config config) {
+        SqlService sql = Sponge.getServiceManager().provide(SqlService.class).get();
+
+        String host = config.getNode("storage").getNode("host").getString();
+        String database = config.getNode("storage").getNode("database").getString();
+        String username = config.getNode("storage").getNode("username").getString();
+        String password = config.getNode("storage").getNode("password").getString();
+
+        if (host == null || host.isEmpty()) {
+            logger.warn("MySQL has been selected but no host has been supplied!");
+            logger.warn("Falling back to ");
+        } else {
+            String uri = "jdbc:mysql://" + host + "/" + database + "?user=" + username + "&password=" + password;
+
+            try {
+                DataSource dataSource = sql.getDataSource(uri);
+
+                this.playerdata = new SQLPlayerDatabase(this, dataSource);
+                this.tops = new SQLTopDatabase(this, dataSource);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    private void setupHocon() {
+        this.playerdata = new HoconPlayerDatabase(this, this.configdir.resolve("playerdata"));
+        this.tops = new HoconTopDatabase(this, this.configdir.resolve("tops.conf"));
     }
 
     @Listener

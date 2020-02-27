@@ -19,12 +19,14 @@ public class SQLPlayerData implements PlayerData {
     private UUID playerUUID;
     private DataSource dataSource;
     private long last_use;
+    private boolean isMySQL;
 
     private ConcurrentHashMap<SkillType, SkillData> skillData = new ConcurrentHashMap<>();
 
-    public SQLPlayerData(UUID playerUUID, DataSource dataSource) {
+    public SQLPlayerData(UUID playerUUID, DataSource dataSource, boolean isMySQL) {
         this.playerUUID = playerUUID;
         this.dataSource = dataSource;
+        this.isMySQL = isMySQL;
         this.last_use = System.currentTimeMillis();
     }
 
@@ -95,13 +97,24 @@ public class SQLPlayerData implements PlayerData {
     public void save() {
         try (Connection connection = dataSource.getConnection()) {
             for (Map.Entry<SkillType, SkillData> entry : skillData.entrySet()) {
-                try (PreparedStatement statement = connection.prepareStatement("MERGE INTO skill_" + entry.getKey().getId() + " KEY (id_lsig, id_msig) VALUES (?, ?, ?, ?);")) {
-                    statement.setLong(1, playerUUID.getLeastSignificantBits());
-                    statement.setLong(2, playerUUID.getMostSignificantBits());
-                    statement.setInt(3, getLevel(entry.getKey()));
-                    statement.setInt(4, getExp(entry.getKey()));
+                if (isMySQL) {
+                    try (PreparedStatement statement = connection.prepareStatement("MERGE INTO skill_" + entry.getKey().getId() + " KEY (id_lsig, id_msig) VALUES (?, ?, ?, ?);")) {
+                        statement.setLong(1, playerUUID.getLeastSignificantBits());
+                        statement.setLong(2, playerUUID.getMostSignificantBits());
+                        statement.setInt(3, getLevel(entry.getKey()));
+                        statement.setInt(4, getExp(entry.getKey()));
 
-                    statement.executeUpdate();
+                        statement.executeUpdate();
+                    }
+                } else {
+                    try (PreparedStatement statement = connection.prepareStatement("REPLACE INTO skill_" + entry.getKey().getId() + "(id_lsig, id_msig, level, experience) VALUES (?, ?, ?, ?);")) {
+                        statement.setLong(1, playerUUID.getLeastSignificantBits());
+                        statement.setLong(2, playerUUID.getMostSignificantBits());
+                        statement.setInt(3, getLevel(entry.getKey()));
+                        statement.setInt(4, getExp(entry.getKey()));
+
+                        statement.executeUpdate();
+                    }
                 }
             }
         } catch (SQLException e) {

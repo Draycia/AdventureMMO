@@ -25,10 +25,12 @@ public class SQLPlayerDatabase implements PlayerDatabase {
     private AdventureMMO plugin;
     private ConcurrentHashMap<UUID, SQLPlayerData> players;
     private DataSource dataSource;
+    private boolean isMySQL;
 
-    public SQLPlayerDatabase(@Nonnull final AdventureMMO mmo, @Nonnull final DataSource dataSource) {
+    public SQLPlayerDatabase(AdventureMMO mmo, DataSource dataSource, boolean isMySQL) {
         this.plugin = mmo;
         this.dataSource = dataSource;
+        this.isMySQL = isMySQL;
         this.players = new ConcurrentHashMap<>();
 
         setupTables();
@@ -52,7 +54,7 @@ public class SQLPlayerDatabase implements PlayerDatabase {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
-                SQLPlayerData playerData = new SQLPlayerData(uuid, dataSource);
+                SQLPlayerData playerData = new SQLPlayerData(uuid, dataSource, isMySQL);
 
                 try (Connection connection = dataSource.getConnection()) {
                     for (SkillType skillType : SkillTypes.VALUES) {
@@ -89,21 +91,6 @@ public class SQLPlayerDatabase implements PlayerDatabase {
 
             return null;
         });
-    }
-
-    private void initialUserSave(PlayerData data) {
-        try (Connection connection = dataSource.getConnection()) {
-            for (SkillType skillType : SkillTypes.VALUES) {
-                try (PreparedStatement statement = connection.prepareStatement("INSERT INTO skill_" + skillType.getId() + " VALUES (0, 0, ?, ?)")) {
-                    statement.setLong(1, data.getPlayerUUID().getLeastSignificantBits());
-                    statement.setLong(2, data.getPlayerUUID().getMostSignificantBits());
-
-                    statement.executeUpdate();
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
