@@ -77,13 +77,13 @@ public class ItemUtils {
     }
 
     @Nonnull
-    public static ItemStack getPlayerHead(@Nonnull final Player p) {
+    public static ItemStack getPlayerHead(@Nonnull final Player player) {
         return ItemStack.builder().itemType(ItemTypes.SKULL).add(Keys.SKULL_TYPE, SkullTypes.PLAYER)
-                .add(Keys.REPRESENTED_PLAYER, p.getProfile()).build();
+                .add(Keys.REPRESENTED_PLAYER, player.getProfile()).build();
     }
 
-    public static void giveSuperTool(@Nonnull final Player p, @Nonnull final ToolType tool) {
-        ItemStack item = p.getItemInHand(HandTypes.MAIN_HAND).get();
+    public static void giveSuperTool(@Nonnull final Player player, @Nonnull final ToolType tool) {
+        ItemStack item = player.getItemInHand(HandTypes.MAIN_HAND).get();
 
         item.offer(new SuperToolData(item.get(Keys.ITEM_ENCHANTMENTS).orElse(Lists.newArrayList()),
                 TextUtils.toString(item.get(Keys.DISPLAY_NAME).orElse(Text.of(""))),
@@ -107,14 +107,14 @@ public class ItemUtils {
         ench.add(Enchantment.of(type, MathUtils.between(lvl, 1, max_lvl)));
         item.offer(Keys.ITEM_ENCHANTMENTS, ench);
 
-        p.setItemInHand(HandTypes.MAIN_HAND, item);
+        player.setItemInHand(HandTypes.MAIN_HAND, item);
     }
 
-    public static void restoreSuperTool(@Nonnull final Player p, @Nonnull final PluginContainer container) {
-        p.closeInventory();
+    public static void restoreSuperTool(@Nonnull final Player player, @Nonnull final PluginContainer container) {
+        player.closeInventory();
         // API 6 p.closeInventory(ServerUtils.getCause(container,
         // NamedCause.of("player", p)));
-        p.getInventory().slots().forEach(slot -> slot.peek()
+        player.getInventory().slots().forEach(slot -> slot.peek()
                 .ifPresent(item -> item.get(SuperToolData.class).ifPresent(data -> slot.set(data.restore(item)))));
     }
 

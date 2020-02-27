@@ -25,11 +25,11 @@ public class CommandItemSet extends PlayerCommand {
     }
 
     @Override
-    public void execute(final Player p, final CommandContext args) {
-        Optional<ItemStack> hand = p.getItemInHand(HandTypes.MAIN_HAND);
+    public void execute(final Player player, final CommandContext args) {
+        Optional<ItemStack> hand = player.getItemInHand(HandTypes.MAIN_HAND);
 
         if (!hand.isPresent()) {
-            p.sendMessage(Text.of(TextColors.RED, "You must be holding an item to use this command"));
+            player.sendMessage(Text.of(TextColors.RED, "You must be holding an item to use this command"));
             return;
         }
 
@@ -37,6 +37,6 @@ public class CommandItemSet extends PlayerCommand {
         ToolType tool = args.<ToolType>getOne("tooltype").get();
 
         this.mmo.getItemDatabase().set(item, tool);
-        this.mmo.getMessages().sendItemSet(p, item, tool);
+        this.mmo.getMessages().sendItemSet(player, item, tool);
     }
 }

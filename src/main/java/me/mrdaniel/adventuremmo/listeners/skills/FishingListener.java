@@ -69,8 +69,10 @@ public class FishingListener extends ActiveAbilityListener {
     @IsCancelled(value = Tristate.FALSE)
     public void onFish(final FishingEvent.Stop e, @Root Player player) {
         e.getTransactions().forEach(trans -> {
-            PlayerData pdata = super.getMMO().getPlayerDatabase().addExp(super.getMMO(), player, super.skill,
-                    this.fish_exp);
+            PlayerData pdata = super.getMMO().getPlayerDatabase().get(player.getUniqueId());
+
+            super.getMMO().getPlayerDatabase().addExp(pdata, super.skill, this.fish_exp);
+
             final int level = pdata.getLevel(super.skill);
 
             ItemStack item = trans.getFinal().createStack();

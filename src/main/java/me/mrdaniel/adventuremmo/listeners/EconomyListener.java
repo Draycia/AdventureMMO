@@ -29,7 +29,7 @@ public class EconomyListener {
 
     @Listener
     public void onLevelUp(final LevelUpEvent e) {
-        this.economy.getOrCreateAccount(e.getPlayer().getUniqueId()).ifPresent(account -> {
+        this.economy.getOrCreateAccount(e.getPlayerData().getPlayer().getUniqueId()).ifPresent(account -> {
             account.deposit(this.economy.getDefaultCurrency(),
                     new BigDecimal(this.initial + (e.getNewLevel() * this.increment)), e.getCause());
         });

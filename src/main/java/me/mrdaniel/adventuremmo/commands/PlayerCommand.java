@@ -18,12 +18,12 @@ public abstract class PlayerCommand implements CommandExecutor {
             return CommandResult.success();
         }
 
-        Player p = (Player) src;
+        Player player = (Player) src;
 
-        this.execute(p, args);
+        this.execute(player, args);
 
         return CommandResult.success();
     }
 
-    public abstract void execute(Player p, CommandContext args) throws CommandException;
+    public abstract void execute(Player player, CommandContext args) throws CommandException;
 }

@@ -26,11 +26,11 @@ public class CommandBlockSet extends PlayerCommand {
     }
 
     @Override
-    public void execute(final Player p, final CommandContext args) {
-        Optional<Location<World>> loc = ServerUtils.getFirstBlock(p);
+    public void execute(final Player player, final CommandContext args) {
+        Optional<Location<World>> loc = ServerUtils.getFirstBlock(player);
 
         if (!loc.isPresent()) {
-            p.sendMessage(Text.of(TextColors.RED, "You must be looking at a block."));
+            player.sendMessage(Text.of(TextColors.RED, "You must be looking at a block."));
             return;
         }
 
@@ -39,6 +39,6 @@ public class CommandBlockSet extends PlayerCommand {
         int exp = args.<Integer>getOne("exp").get();
 
         this.mmo.getItemDatabase().set(block, skill, exp);
-        this.mmo.getMessages().sendBlockSet(p, block, skill, exp);
+        this.mmo.getMessages().sendBlockSet(player, block, skill, exp);
     }
 }

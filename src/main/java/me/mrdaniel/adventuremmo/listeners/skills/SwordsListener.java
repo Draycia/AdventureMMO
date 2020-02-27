@@ -42,8 +42,10 @@ public class SwordsListener extends ActiveAbilityListener {
     @Listener
     public void onTarget(final PlayerDamageEntityEvent e) {
         if (e.getTool() == super.tool) {
-            PlayerData pdata = super.getMMO().getPlayerDatabase().addExp(super.getMMO(), e.getPlayer(), super.skill,
-                    e.isDeath() ? this.kill_exp : this.damage_exp);
+            PlayerData pdata = super.getMMO().getPlayerDatabase().get(e.getPlayer().getUniqueId());
+
+            super.getMMO().getPlayerDatabase().addExp(pdata, super.skill, e.isDeath() ? this.kill_exp : this.damage_exp);
+
             Entity target = e.getEntity();
             if (e.isDeath()) {
                 if (Abilities.DECAPITATE.getChance(pdata.getLevel(super.skill))) {

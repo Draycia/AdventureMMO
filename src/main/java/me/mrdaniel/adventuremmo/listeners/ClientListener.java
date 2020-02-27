@@ -17,8 +17,15 @@ public class ClientListener extends MMOObject {
 
     @Listener
     public void onQuit(final ClientConnectionEvent.Disconnect e) {
-        super.getMMO().getPlayerDatabase().unload(e.getTargetEntity().getUniqueId());
+        // TODO: Unload on a timer after disconnect
+        //super.getMMO().getPlayerDatabase().unload(e.getTargetEntity().getUniqueId());
         super.getMMO().getMenus().getScoreboardManager().unload(e.getTargetEntity());
         ItemUtils.restoreSuperTool(e.getTargetEntity(), super.getMMO().getContainer());
+    }
+
+    @Listener
+    public void onJoin(final ClientConnectionEvent.Join event) {
+        // Loads the player's data if it isn't already loaded
+        super.getMMO().getPlayerDatabase().get(event.getTargetEntity().getUniqueId());
     }
 }

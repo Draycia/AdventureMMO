@@ -3,6 +3,7 @@ package me.mrdaniel.adventuremmo.io.playerdata;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.UUID;
 
 import javax.annotation.Nonnull;
 
@@ -13,6 +14,8 @@ import me.mrdaniel.adventuremmo.catalogtypes.skills.SkillType;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.Player;
 
 public class HoconPlayerData implements PlayerData {
 
@@ -23,7 +26,10 @@ public class HoconPlayerData implements PlayerData {
 
     private long last_use;
 
-    public HoconPlayerData(@Nonnull final Path path) {
+    private UUID playerUUID;
+
+    public HoconPlayerData(@Nonnull final Path path, UUID playerUUID) {
+        this.playerUUID = playerUUID;
         this.loader = HoconConfigurationLoader.builder().setPath(path).build();
 
         if (!Files.exists(path)) {
@@ -86,5 +92,15 @@ public class HoconPlayerData implements PlayerData {
 
     private void setLastUse() {
         this.last_use = System.currentTimeMillis();
+    }
+
+    @Override
+    public UUID getPlayerUUID() {
+        return playerUUID;
+    }
+
+    @Override
+    public Player getPlayer() {
+        return Sponge.getServer().getPlayer(getPlayerUUID()).get();
     }
 }

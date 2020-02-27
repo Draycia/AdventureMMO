@@ -80,6 +80,7 @@ public class HoconTopDatabase extends MMOObject implements TopDatabase {
         for (int i = 1; i <= 10; i++) {
             if (name.equalsIgnoreCase(node.getNode(String.valueOf(i), "name").getString())) {
                 node.getNode(String.valueOf(i), "level").setValue(level);
+
                 for (int j = i; j > 1; j--) {
                     if (level > node.getNode(String.valueOf(j - 1), "level").getInt()) {
                         node.getNode(String.valueOf(j), "name").setValue(node.getNode(String.valueOf(j - 1), "name"))
@@ -90,9 +91,11 @@ public class HoconTopDatabase extends MMOObject implements TopDatabase {
                         node.getNode(String.valueOf(j - 1), "level").setValue(level);
                     }
                 }
+
                 return;
             }
         }
+
         for (int i = 1; i <= 10; i++) {
             if (level >= node.getNode(String.valueOf(i), "level").getInt()) {
                 for (int j = 9; j > i; j--) {
@@ -101,8 +104,10 @@ public class HoconTopDatabase extends MMOObject implements TopDatabase {
                     node.getNode(String.valueOf(j + 1), "level").setValue(node.getNode(String.valueOf(j), "level"))
                             .getInt();
                 }
+
                 node.getNode(String.valueOf(i), "name").setValue(name);
                 node.getNode(String.valueOf(i), "level").setValue(level);
+
                 return;
             }
         }

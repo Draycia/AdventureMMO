@@ -17,7 +17,7 @@ public class CommandSettings extends PlayerCommand {
     }
 
     @Override
-    public void execute(final Player p, final CommandContext args) {
-        this.mmo.getMenus().sendSettingsInfo(p);
+    public void execute(final Player player, final CommandContext args) {
+        this.mmo.getMenus().sendSettingsInfo(player);
     }
 }

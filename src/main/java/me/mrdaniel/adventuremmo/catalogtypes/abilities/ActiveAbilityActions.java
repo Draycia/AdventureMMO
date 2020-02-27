@@ -8,15 +8,15 @@ public interface ActiveAbilityActions {
 
     ActiveAbilityActions EMPTY = new ActiveAbilityActions() {
         @Override
-        public void activate(AdventureMMO mmo, Player p) {
+        public void activate(AdventureMMO mmo, Player player) {
         }
 
         @Override
-        public void deactivate(AdventureMMO mmo, Player p) {
+        public void deactivate(AdventureMMO mmo, Player player) {
         }
     };
 
-    void activate(AdventureMMO mmo, Player p);
+    void activate(AdventureMMO mmo, Player player);
 
-    void deactivate(AdventureMMO mmo, Player p);
+    void deactivate(AdventureMMO mmo, Player player);
 }
