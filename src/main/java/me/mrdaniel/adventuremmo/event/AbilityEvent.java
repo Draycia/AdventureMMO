@@ -3,6 +3,7 @@ package me.mrdaniel.adventuremmo.event;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.cause.Cause;
@@ -20,7 +21,7 @@ public class AbilityEvent extends AbstractEvent implements Cancellable {
     private final ToolType tool;
     private final boolean onblock;
 
-    private final Cause cause;
+    private final Cause cause = Sponge.getCauseStackManager().getCurrentCause();
     private boolean cancelled;
 
     @Nullable
@@ -28,13 +29,11 @@ public class AbilityEvent extends AbstractEvent implements Cancellable {
     @Nullable
     private SkillType skill;
 
-    public AbilityEvent(@Nonnull final AdventureMMO mmo, @Nonnull final Player player, @Nonnull final ToolType tool,
-            final boolean onblock) {
+    public AbilityEvent(Player player, ToolType tool, boolean onblock) {
         this.player = player;
         this.tool = tool;
         this.onblock = onblock;
 
-        this.cause = Cause.builder().append(mmo.getContainer()).build(EventContext.empty());
         this.cancelled = false;
 
         this.ability = null;
@@ -73,6 +72,7 @@ public class AbilityEvent extends AbstractEvent implements Cancellable {
         this.skill = skill;
     }
 
+    @Nonnull
     @Override
     public Cause getCause() {
         return this.cause;

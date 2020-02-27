@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
+import me.mrdaniel.adventuremmo.event.PlayerDataEvent;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
 
 import me.mrdaniel.adventuremmo.AdventureMMO;
@@ -48,13 +50,17 @@ public class HoconPlayerDatabase implements PlayerDatabase {
     public synchronized void unload(@Nonnull final UUID uuid) {
         Optional.ofNullable(this.players.get(uuid)).ifPresent(data -> {
             data.save();
+            Sponge.getEventManager().post(new PlayerDataEvent.Unload(data));
             this.players.remove(uuid);
         });
     }
 
     @Override
     public synchronized void unloadAll() {
-        this.players.values().forEach(HoconPlayerData::save);
+        this.players.values().forEach(data -> {
+            data.save();
+            Sponge.getEventManager().post(new PlayerDataEvent.Unload(data));
+        });
         this.players.clear();
     }
 
@@ -66,6 +72,8 @@ public class HoconPlayerDatabase implements PlayerDatabase {
         if (data == null) {
             data = new HoconPlayerData(this.path.resolve(uuid.toString() + ".conf"), uuid);
             this.players.put(uuid, data);
+
+            Sponge.getEventManager().post(new PlayerDataEvent.Load(data));
         }
 
         return data;

@@ -3,14 +3,11 @@ package me.mrdaniel.adventuremmo.io.playerdata;
 import me.mrdaniel.adventuremmo.AdventureMMO;
 import me.mrdaniel.adventuremmo.catalogtypes.skills.SkillType;
 import me.mrdaniel.adventuremmo.catalogtypes.skills.SkillTypes;
+import me.mrdaniel.adventuremmo.event.PlayerDataEvent;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.service.sql.SqlService;
 
 import javax.annotation.Nonnull;
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -38,20 +35,23 @@ public class SQLPlayerDatabase implements PlayerDatabase {
 
     @Override
     public synchronized void unload(@Nonnull final UUID uuid) {
-        this.players.remove(uuid);
-        // TODO: Save?
+        Optional.ofNullable(this.players.get(uuid)).ifPresent(data -> {
+            data.save();
+            Sponge.getEventManager().post(new PlayerDataEvent.Unload(data));
+            this.players.remove(uuid);
+        });
     }
 
     @Override
     public synchronized void unloadAll() {
-        System.out.println("Unloading and saving player data!");
-        this.players.values().forEach(SQLPlayerData::save);
+        this.players.values().forEach(data -> {
+            data.save();
+            Sponge.getEventManager().post(new PlayerDataEvent.Unload(data));
+        });
         this.players.clear();
     }
 
     private CompletableFuture<PlayerData> loadDataAsync(UUID uuid) {
-        // TODO: stub
-
         return CompletableFuture.supplyAsync(() -> {
             try {
                 SQLPlayerData playerData = new SQLPlayerData(uuid, dataSource, isMySQL);
@@ -83,6 +83,8 @@ public class SQLPlayerDatabase implements PlayerDatabase {
                 }
 
                 players.put(uuid, playerData);
+
+                Sponge.getEventManager().post(new PlayerDataEvent.Load(playerData));
 
                 return playerData;
             } catch (SQLException e) {

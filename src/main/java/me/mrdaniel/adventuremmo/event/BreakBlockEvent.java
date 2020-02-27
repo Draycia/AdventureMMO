@@ -3,14 +3,13 @@ package me.mrdaniel.adventuremmo.event;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.impl.AbstractEvent;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import me.mrdaniel.adventuremmo.AdventureMMO;
 import me.mrdaniel.adventuremmo.catalogtypes.tools.ToolType;
 import me.mrdaniel.adventuremmo.io.items.BlockData;
 
@@ -21,16 +20,13 @@ public class BreakBlockEvent extends AbstractEvent {
     private final BlockData block;
     private final ToolType tool;
 
-    private final Cause cause;
+    private final Cause cause = Sponge.getCauseStackManager().getCurrentCause();
 
-    public BreakBlockEvent(@Nonnull final AdventureMMO mmo, @Nonnull final Player player,
-            @Nonnull final Location<World> location, @Nonnull final BlockData block, @Nullable final ToolType tool) {
+    public BreakBlockEvent(Player player, Location<World> location, BlockData block, ToolType tool) {
         this.player = player;
         this.location = location;
         this.block = block;
         this.tool = tool;
-
-        this.cause = Cause.builder().append(mmo.getContainer()).build(EventContext.empty());
     }
 
     @Nonnull
@@ -53,6 +49,7 @@ public class BreakBlockEvent extends AbstractEvent {
         return this.tool;
     }
 
+    @Nonnull
     @Override
     public Cause getCause() {
         return this.cause;
